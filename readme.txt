@@ -5,15 +5,19 @@ Requires at least: 3.0.1
 Tested up to: 5.9
 Stable tag: 1.0.7
 License: GPLv2
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: mmww
+Author URI: https://github.com/OllieJones
+Plugin URI: https://plumislandmedia.net/index-wp-mysql-for-speed/
+Github Plugin URI: https://github.com/OllieJones/mmww/
+Primary Branch: main
 
 Media Metadata Workflow Wizard: Integrate your media metadata workflow with WordPress's Media Library
 
 == To Do ==
 
 * Figure out how to put keywords into a taxonomy if that's what the user wants.
-* Add support for the Yet Another Photo Blog (YAPB) [plugin]{http://wordpress.org/extend/plugins/yet-another-photoblog/}
+* Add support for the Yet Another Photo Blog (YAPB) [plugin]{https://wordpress.org/extend/plugins/yet-another-photoblog/}
 * Improve the syntax of the templates.
 * Add support for aac and video file metadata.
 * Ask for and receive lots of sample files from users, and use them to test.
@@ -34,10 +38,10 @@ order of the date and time they were taken, and your pdfs in the order they were
 
 You can specify templates defining what metadata items should be used to create each WordPress attachment post's fields: title, caption, alt text, and description.
 
-For audio files, MMWW can automatically create the [audio] shortcode provided by [Jetpack](http://wordpress.org/extend/plugins/jetpack/).
+For audio files, MMWW can automatically create the [audio] shortcode provided by [Jetpack](https://wordpress.org/extend/plugins/jetpack/).
 Choose Link To Media File and the shortcode will be generated for you. WordPress 3.6 and later has an integrated audio player, so you may not need this feature. The Settings page lets you turn this behavior off.
 
-If you use the [Media Tags][http://wordpress.org/plugins/media-tags/] plugin together with this one, you'll be able to handle metadata tags as a taxonomy. You can also use metadata ratings (one to five stars) as a taxonomy.
+If you use the [Media Tags][https://wordpress.org/plugins/media-tags/] plugin together with this one, you'll be able to handle metadata tags as a taxonomy. You can also use metadata ratings (one to five stars) as a taxonomy.
 
 
 == Installation ==
@@ -232,11 +236,11 @@ There's a detail to this:  The timestamps in the media files need to be interpre
 
 = Metadata Standards Reference =
 
-* [Adobe XMP](http://www.adobe.com/products/xmp/)
-* [ID3 for MP3 files](http://id3.org/)
-* [The ID3 Popularimeter](http://en.wikipedia.org/wiki/ID3#ID3v2_Rating_tag_issue) -- music file ratings
-* [EXIF for JPEG files](http://www.exif.org/)
-* [IPTC Photo Metadata](http://www.iptc.org/site/Photo_Metadata/)
+* [Adobe XMP](https://www.adobe.com/products/xmp/)
+* [ID3 for MP3 files](https://id3.org/)
+* [The ID3 Popularimeter](https://en.wikipedia.org/wiki/ID3#ID3v2_Rating_tag_issue) -- music file ratings
+* [EXIF for JPEG files](https://www.exif.org/)
+* [IPTC Photo Metadata](https://www.iptc.org/site/Photo_Metadata/)
 
 == Frequently Asked Questions ==
 
@@ -327,9 +331,9 @@ Upgrade to WP 4.1.1  Add "reread metadata" link to grid view of media.
 
 The stuff the US NSA is collecting isn't really metadata: it's call detail records. This stuff is metadata. Metadata can be poetry.
 
-Ognjen Djuraskovic of [firstsiteguide.com](http://www.firstsiteguide.com/) has generously provided Serbian and Spanish translations of MMWW. Хвала / Gracias / Thanks Ognjen!
+Ognjen Djuraskovic of [firstsiteguide.com](https://www.firstsiteguide.com/) has generously provided Serbian and Spanish translations of MMWW. Хвала / Gracias / Thanks Ognjen!
 
 This plugin incorporates the Zend Media Framework by Sven Vollbehr and Ryan Butterfield which they generously made available under the BSD license. It comes in handy for retrieving
 and decoding the ID3 tags from audio files. See the LICENSE.txt file in this distribution.
 
-Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) Thanks, Sven and Ryan!
+Copyright (c) 2005-2009 Zend Technologies USA Inc. (https://www.zend.com) Thanks, Sven and Ryan!
