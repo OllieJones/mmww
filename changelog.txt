@@ -1,0 +1,68 @@
+== Changelog ==
+
+= 0.9.3 =
+
+ 1. Metadata extraction working for jpg, png, mp3, pdf files. (There's no metadata in gif files, and tiff files aren't supported by WordPress).
+ 1. Integration with the V3.5 media manager is complete.
+ 1. Automatic [audio] shortcode insertion working both pre- and post- WordPress 3.5.
+ 1. The Settings page allows specification of templates for populating attachment-post fields.
+
+= 0.9.4 =
+
+ 1. Add support for file ratings set by Windows Explorer and media player.
+
+= 1.0.0 =
+
+Add a PDF filter to the media manager.
+
+Add the reread-metadata function to the media manager.
+
+Add better metadata string templates. You can use parentheses to delimit optional parts of a metadata template string. For example, not all media files contain {copyright} metadata.  If you put this into your metadata template string, it will omit the whole copyright clause if there's no {copyright}.
+
+      (Copyright &copy; {copyright} )
+
+The parentheses denote the whole clause as optional, and omitted if the metadata isn't available. Similarly, you can create a URL that will display a map, but only if latitude and longitude are available, like this:
+
+     (<A href="https://maps.google.com/?ll={latitude},{longitude}&z=18" target="_blank">Map {title}</A>)
+
+= 1.0.1 =
+
+* Jetpack's carousel plugin uses the {aperture} and {shutter_speed} items for photos, so retain them. Document already-existing {iso} and {focal_length} items.
+* Add {focal_length35} item for focal length in 35mm sensor size equivalent
+* Add {altitude} from GPS information.
+* Add {direction} from GPS information. 270M means magnetic west, 180T means true south.
+* Add {scene_capture_type}, {sharpness}, {subject_distance} and {exposurebias}
+
+= 1.0.2 =
+
+A minor upgrade; Captures metadata correctly from PDFs containing multiple XMP chunks, thanks to Kevin Fraser for finding this bug.
+
+= 1.0.3 =
+
+A minor upgrade;
+* Add a {filename} tag for workflows where the filename is needed in the post.
+* Handle some non-ASCII trouble in titles, content, and tags.
+Thanks to Tony van der Voort for reporting these problems.
+
+= 1.0.4 =
+
+Upgrade to WP 3.8.  Add more complete support for IPTC metadata, using {iptc:name} tags.
+
+= 1.0.5 =
+
+Upgrade to WP 3.8.1  Repair defect with exif's {iso} tag. Add Spanish and Serbian translations thanks to Ognjen Djuraskovic.
+
+Tests clean with WP 3.9.
+
+= 1.0.6 =
+
+* Upgrade to WP 4.2
+* Add "reread metadata" link to grid view of media per https://core.trac.wordpress.org/ticket/29056
+* Add WordPress-specific tags
+      {wp:attachmentid}, {wp:parentid}, {wp:parenttitle}, {wp:parentslug}
+
+Tests clean with WP 4.1.1
+
+= 1.0.8 =
+WordPress 5.9 compatibility.
+
