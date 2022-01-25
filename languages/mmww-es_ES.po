@@ -1,0 +1,596 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: MMWW\n"
+"POT-Creation-Date: 2014-02-27 09:46-0500\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.5\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"PO-Revision-Date: \n"
+"Last-Translator: jelena kovacevic <jecajeca260@gmail.com>\n"
+"Language-Team: \n"
+"X-Poedit-SearchPath-0: .\n"
+
+#. translators: name of a UI button element in the insert media popup
+#: code/audio_shortcode_34_support.php:46
+msgctxt "button_name"
+msgid "Audio Player"
+msgstr "Reproductor de Audio"
+
+#: code/exif.php:56
+msgid "EXIF metadata corrupted by Microsoft Windows properties defect"
+msgstr ""
+"Metadatos EXIF corrompidos por las propiedades de Microsoft Windows por "
+"defecto"
+
+#: code/exif.php:141
+msgctxt "flash"
+msgid "No Flash"
+msgstr "No  Flash"
+
+#: code/exif.php:142
+msgctxt "flash"
+msgid "Fired"
+msgstr "Disparado"
+
+#: code/exif.php:143
+msgctxt "flash"
+msgid "Fired, Return not detected"
+msgstr "Disparado, no se detectó Regreso"
+
+#: code/exif.php:144
+msgctxt "flash"
+msgid "Fired, Return detected"
+msgstr "Disparado, se detectó Regreso"
+
+#: code/exif.php:145
+msgctxt "flash"
+msgid "On, Did not fire"
+msgstr "Encendido, no disparó"
+
+#: code/exif.php:146
+msgctxt "flash"
+msgid "On, Fired"
+msgstr "Encendido, Disparó"
+
+#: code/exif.php:147
+msgctxt "flash"
+msgid "On, Return not detected"
+msgstr "Encendido, No se detectó Regreso"
+
+#: code/exif.php:148
+msgctxt "flash"
+msgid "On, Return detected"
+msgstr "Encendido, se detectó Regreso"
+
+#: code/exif.php:149
+msgctxt "flash"
+msgid "Off, Did not fire"
+msgstr "Apagado, no disparó"
+
+#: code/exif.php:150
+msgctxt "flash"
+msgid "Off, Did not fire, Return not detected"
+msgstr "Apagado, no disparó, no se detectó Regreso"
+
+#: code/exif.php:151
+msgctxt "flash"
+msgid "Auto, Did not fire"
+msgstr "Auto, no se disparó"
+
+#: code/exif.php:152
+msgctxt "flash"
+msgid "Auto, Fired"
+msgstr "Auto, Disparado"
+
+#: code/exif.php:153
+msgctxt "flash"
+msgid "Auto, Fired, Return not detected"
+msgstr "Auto, No se disparó, no se detectó Regreso"
+
+#: code/exif.php:154
+msgctxt "flash"
+msgid "Auto, Fired, Return detected"
+msgstr "Auto, no se disparó"
+
+#: code/exif.php:155
+msgctxt "flash"
+msgid "No flash function"
+msgstr "Sin función flash"
+
+#: code/exif.php:156
+msgctxt "flash"
+msgid "Off, No flash function"
+msgstr "Apagado, sin función flash"
+
+#: code/exif.php:157
+msgctxt "flash"
+msgid "Fired, Red-eye reduction"
+msgstr "Disparado, Reducción de ojos rojos"
+
+#: code/exif.php:158
+msgctxt "flash"
+msgid "Fired, Red-eye reduction, Return not detected"
+msgstr "Disparado, Reducción de ojos rojos, no se detectó Regreso"
+
+#: code/exif.php:159
+msgctxt "flash"
+msgid "Fired, Red-eye reduction, Return detected"
+msgstr "Disparado, Reducción de ojos rojos, se detectó regreso"
+
+#: code/exif.php:160
+msgctxt "flash"
+msgid "On, Red-eye reduction"
+msgstr "Encendido, reducción de ojos rojos"
+
+#: code/exif.php:161
+msgctxt "flash"
+msgid "On, Red-eye reduction, Return not detected"
+msgstr "Encendido, reducción de ojos rojos, no se detectó Regreso"
+
+#: code/exif.php:162
+msgctxt "flash"
+msgid "On, Red-eye reduction, Return detected"
+msgstr "Encendido, Reducción de ojos rojos, se detectó Regreso"
+
+#: code/exif.php:163
+msgctxt "flash"
+msgid "Off, Red-eye reduction"
+msgstr "Apagado, reducción de ojos rojos"
+
+#: code/exif.php:164
+msgctxt "flash"
+msgid "Auto, Did not fire, Red-eye reduction"
+msgstr "Auto, no se disparó, Reducción de ojos rojos"
+
+#: code/exif.php:165
+msgctxt "flash"
+msgid "Auto, Fired, Red-eye reduction"
+msgstr "Auto, Disparado, Reducción de ojos rojos"
+
+#: code/exif.php:166
+msgctxt "flash"
+msgid "Auto, Fired, Red-eye reduction, Return not detected"
+msgstr "Auto, Disparado, Reducción de ojos rojos, no se detectó Regreso"
+
+#: code/exif.php:167
+msgctxt "flash"
+msgid "Auto, Fired, Red-eye reduction, Return detected"
+msgstr "Auto, Disparado, Reducción de ojos rojos, se detectó Regreso"
+
+#: code/exif.php:174
+msgctxt "scene_capture_type"
+msgid "Standard"
+msgstr "Estándar"
+
+#: code/exif.php:175
+msgctxt "scene_capture_type"
+msgid "Landscape"
+msgstr "Paisaje"
+
+#: code/exif.php:176
+msgctxt "scene_capture_type"
+msgid "Portrait"
+msgstr "Retrato"
+
+#: code/exif.php:177
+msgctxt "scene_capture_type"
+msgid "Night"
+msgstr "Noche"
+
+#: code/exif.php:184
+msgctxt "sharpness"
+msgid "Normal"
+msgstr "Normal"
+
+#: code/exif.php:185
+msgctxt "sharpness"
+msgid "Soft"
+msgstr "Suave"
+
+#: code/exif.php:186
+msgctxt "sharpness"
+msgid "Hard"
+msgstr "Duro"
+
+#: code/exif.php:193
+msgctxt "light_source"
+msgid "Unknown"
+msgstr "Desconocido"
+
+#: code/exif.php:194
+msgctxt "light_source"
+msgid "Daylight"
+msgstr "Luz diurna"
+
+#: code/exif.php:195
+msgctxt "light_source"
+msgid "Fluorescent"
+msgstr "Fluorescente"
+
+#: code/exif.php:196
+msgctxt "light_source"
+msgid "Tungsten"
+msgstr "Tungsteno"
+
+#: code/exif.php:197
+msgctxt "light_source"
+msgid "Flash"
+msgstr "flash"
+
+#: code/exif.php:198
+msgctxt "light_source"
+msgid "Fine weather"
+msgstr "Buen tiempo"
+
+#: code/exif.php:199
+msgctxt "light_source"
+msgid "Cloudy weather"
+msgstr "Tiempo nublado"
+
+#: code/exif.php:200
+msgctxt "light_source"
+msgid "Shade"
+msgstr "Sombra"
+
+#: code/exif.php:201
+msgctxt "light_source"
+msgid "Daylight fluorescent"
+msgstr "Luz de día fluorescente"
+
+#: code/exif.php:202
+msgctxt "light_source"
+msgid "Day white fluorescent"
+msgstr "Luz de día blanca fluorescente"
+
+#: code/exif.php:203
+msgctxt "light_source"
+msgid "Cool white fluorescent"
+msgstr "Fluorescente blanca fría"
+
+#: code/exif.php:204
+msgctxt "light_source"
+msgid "White fluorescent"
+msgstr "Fluorescente blanca"
+
+#: code/exif.php:205
+msgctxt "light_source"
+msgid "Standard light A"
+msgstr "Luz estándar A"
+
+#: code/exif.php:206
+msgctxt "light_source"
+msgid "Standard light B"
+msgstr "Luz estándar B"
+
+#: code/exif.php:207
+msgctxt "light_source"
+msgid "Standard light C"
+msgstr "Luz estándar C"
+
+#: code/exif.php:208
+msgctxt "light_source"
+msgid "D55"
+msgstr "D55"
+
+#: code/exif.php:209
+msgctxt "light_source"
+msgid "D65"
+msgstr "D65"
+
+#: code/exif.php:210
+msgctxt "light_source"
+msgid "D75"
+msgstr "D75"
+
+#: code/exif.php:211
+msgctxt "light_source"
+msgid "D50"
+msgstr "D50"
+
+#: code/exif.php:212
+msgctxt "light_source"
+msgid "ISO studio tungsten"
+msgstr "ISO tungsteno estudio"
+
+#: code/exif.php:213
+msgctxt "light_source"
+msgid "Other light source"
+msgstr "Otras fuente de luz"
+
+#: code/exif.php:220
+msgctxt "metering_mode"
+msgid "Unknown"
+msgstr "Desconocido"
+
+#: code/exif.php:221
+msgctxt "metering_mode"
+msgid "Average"
+msgstr "Promedio"
+
+#: code/exif.php:222
+msgctxt "metering_mode"
+msgid "Center weighted average"
+msgstr "Promedio ponderado central"
+
+#: code/exif.php:223
+msgctxt "metering_mode"
+msgid "Spot"
+msgstr "Reflector"
+
+#: code/exif.php:224
+msgctxt "metering_mode"
+msgid "Multi Spot"
+msgstr "Multi Reflector"
+
+#: code/exif.php:225
+msgctxt "metering_mode"
+msgid "Pattern"
+msgstr "Patrón"
+
+#: code/exif.php:226
+msgctxt "metering_mode"
+msgid "Partial"
+msgstr "Parcial"
+
+#: code/exif.php:227
+msgctxt "metering_mode"
+msgid "Other"
+msgstr "Otro"
+
+#: code/exif.php:234
+msgctxt "sensing_method"
+msgid "One-chip color area sensor"
+msgstr "Sensor de área de color de un chip"
+
+#: code/exif.php:235
+msgctxt "sensing_method"
+msgid "Two-chip color area sensor"
+msgstr "Sensor de área de color de dos chips"
+
+#: code/exif.php:236
+msgctxt "sensing_method"
+msgid "Three-chip color area sensor"
+msgstr "Sensor de área de color de tres chips"
+
+#: code/exif.php:237
+msgctxt "sensing_method"
+msgid "Color sequential area sensor"
+msgstr "Sensor de área de color secuencial"
+
+#: code/exif.php:238
+msgctxt "sensing_method"
+msgid "Trilinear sensor"
+msgstr "Sensor trilineal"
+
+#: code/exif.php:239
+msgctxt "sensing_method"
+msgid "Color sequential linear sensor"
+msgstr "Sensor lineal de color secuencial"
+
+#: code/exif.php:246
+msgctxt "exposure_mode"
+msgid "Auto"
+msgstr "Auto"
+
+#: code/exif.php:247
+msgctxt "exposure_mode"
+msgid "Manual"
+msgstr "Manual"
+
+#: code/exif.php:248
+msgctxt "exposure_mode"
+msgid "Auto bracket"
+msgstr "Bracketing automático"
+
+#: code/exif.php:255
+msgctxt "exposure_program"
+msgid "Manual"
+msgstr "Manual"
+
+#: code/exif.php:256
+msgctxt "exposure_program"
+msgid "Normal Program"
+msgstr "Programa normal"
+
+#: code/exif.php:257
+msgctxt "exposure_program"
+msgid "Aperture Priority"
+msgstr "Prioridad de apertura"
+
+#: code/exif.php:258
+msgctxt "exposure_program"
+msgid "Shutter Priority"
+msgstr "Prioridad de obturación"
+
+#: code/exif.php:259
+msgctxt "exposure_program"
+msgid "Creative Program"
+msgstr "Programa creativo"
+
+#: code/exif.php:260
+msgctxt "exposure_program"
+msgid "Action Program"
+msgstr "Programa de Acción"
+
+#: code/exif.php:261
+msgctxt "exposure_program"
+msgid "Portrait Mode"
+msgstr "Modo Retrato"
+
+#: code/exif.php:262
+msgctxt "exposure_program"
+msgid "Landscape Mode"
+msgstr "Modo Paisaje"
+
+#: code/mmww_admin.php:21
+msgid "Media Metadata Workflow Wizard"
+msgstr "Metadatos de medios Workflow Wizard"
+
+#: code/mmww_admin.php:22
+msgid "Media Metadata"
+msgstr "Metadatos de Medios"
+
+#: code/mmww_admin.php:46
+msgid ""
+"These settings control the insertion of ID3 and other metadata from uploaded "
+"MP3 audio files into WordPress attachment data."
+msgstr ""
+"Estos ajustes controlan la inserción de ID3 y otros metadatos de archivos de "
+"audio MP3 cargados en datos adjuntos de WordPress."
+
+#: code/mmww_admin.php:54
+msgid ""
+"These settings control the insertion of EXIF, IPTC, and other metadata from "
+"uploaded image files (JPG, PNG) into WordPress attachment data."
+msgstr ""
+"Estos ajustes controlan la inserción de EXIF, IPTC y otros metadatos de "
+"archivos de imagen cargados (JPG, PNG) en datos adjuntos de WordPress."
+
+#: code/mmww_admin.php:62
+msgid ""
+"These settings control the insertion of PDF file properties into WordPress "
+"attachment data."
+msgstr ""
+"Estos ajustes controlan la inserción de las propiedades del archivo PDF en "
+"datos adjuntos de WordPress."
+
+#: code/mmww_admin.php:95
+msgid "timestamps in media metadata, when available"
+msgstr "marcas de tiempo en los metadatos de medios,  cuando disponibles"
+
+#: code/mmww_admin.php:96
+msgid "dates of upload"
+msgstr "Fechas de carga"
+
+#: code/mmww_admin.php:107
+msgid "from tags in media files"
+msgstr "de etiquetas en archivos multimedia"
+
+#: code/mmww_admin.php:108 code/mmww_admin.php:119 code/mmww_admin.php:134
+msgid "never"
+msgstr "Nunca"
+
+#: code/mmww_admin.php:118
+msgid "from ratings (zero to five stars) in media files"
+msgstr "de calificaciones (cero a cinco estrellas) en archivos multimedia"
+
+#: code/mmww_admin.php:133
+msgid "when the author selects Link To <em>Media File</em>"
+msgstr "cuando el autor selecciona Vincular a <em> Archivo Multimedia </em>"
+
+#: code/mmww_admin.php:187
+#, php-format
+msgid "Media Metadata Workflow Wizard (Version %1s) Settings"
+msgstr "Configuración Metadatos de Medios Workflow Wizard (versión %1s )"
+
+#: code/mmww_admin.php:191
+msgid "Settings for all media types"
+msgstr "Configuración para todos los tipos de medios"
+
+#: code/mmww_admin.php:197
+msgid "Set attachment dates using the ..."
+msgstr "Establecer fechas de adjunto usando los ..."
+
+#: code/mmww_admin.php:205
+msgid "Set attachment tags ..."
+msgstr "Establecer etiquetas de adjunto ..."
+
+#: code/mmww_admin.php:213
+msgid "Set attachment ratings ..."
+msgstr "Establecer clasificación de adjunto"
+
+#: code/mmww_admin.php:221
+msgid "Audio Settings"
+msgstr "Configuración de audio"
+
+#: code/mmww_admin.php:227
+msgid "Audio title template"
+msgstr "Plantilla de título Audio"
+
+#: code/mmww_admin.php:235
+msgid "Audio description template"
+msgstr "Plantilla de descripción de Audio"
+
+#: code/mmww_admin.php:243
+msgid "Audio player scrolling-text template"
+msgstr "Plantilla de desplazamiento de texto para el reproductor de audio"
+
+#: code/mmww_admin.php:254
+msgid "Automatically insert audio player shortcodes into posts ... "
+msgstr ""
+"Insertar automáticamente códigos cortos del reproductor de audio en "
+"publicaciones …"
+
+#: code/mmww_admin.php:263
+msgid "Image Settings"
+msgstr "Configuración Imagen"
+
+#: code/mmww_admin.php:269
+msgid "Image title template"
+msgstr "Plantilla Título de Imagen"
+
+#: code/mmww_admin.php:277
+msgid "Image alternate text template (accessibility)"
+msgstr "Plantilla de texto alternativo de la imagen (accesibilidad)"
+
+#: code/mmww_admin.php:286
+msgid "Image caption template"
+msgstr "Plantilla leyenda de imagen"
+
+#: code/mmww_admin.php:294
+msgid "Image description template"
+msgstr "Plantilla descripción de imagen"
+
+#: code/mmww_admin.php:304
+msgid "PDF Settings"
+msgstr "Configuración PDF"
+
+#: code/mmww_admin.php:310
+msgid "PDF title template"
+msgstr "Plantilla título  PDF"
+
+#: code/mmww_admin.php:318
+msgid "PDF description template"
+msgstr "Plantilla descripción PDF"
+
+#: code/mmww_admin.php:336
+msgid "Save Changes"
+msgstr "Guardar cambios"
+
+#: code/mmww_media_upload.php:250
+msgid "Unrecognized media type in file "
+msgstr "Tipo de medio no reconocido en el archivo"
+
+#: code/pdfextras.php:15
+msgid "PDFs"
+msgstr "documentos PDF"
+
+#: code/pdfextras.php:15
+msgid "Manage PDFs"
+msgstr "Administrar archivos PDF"
+
+#: code/pdfextras.php:15
+#, php-format
+msgid "PDF <span class=\"count\">(%s)</span>"
+msgid_plural "PDFs <span class=\"count\">(%s)</span>"
+msgstr[0] "PDF <span class=\"count\"> (%s) </span>"
+msgstr[1] "PDF <span class=\"count\"> (%s) </span>"
+msgstr[2] "PDF <span class=\"count\"> (%s) </span>"
+
+#: code/reread.php:34
+msgid "Media attachment metadata reloaded from file. Update to save it."
+msgstr ""
+"Metadatos de Adjunto de medios recargados desde el archivo. Actualice para "
+"guardarlo."
+
+#: code/reread.php:194
+msgid "Reload Metadata"
+msgstr "Recargar metadatos"
