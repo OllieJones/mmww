@@ -3,7 +3,7 @@ Contributors: olliejones
 Tags: mp3, images, metadata, exif, id3, iptc
 Requires at least: 3.0.1
 Tested up to: 5.9
-Stable tag: 1.0.7
+Stable tag: 1.0.8
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: mmww
