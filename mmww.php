@@ -14,7 +14,7 @@ License: GPLv2 or later
 */
 /** current version number  */
 if ( ! defined( 'MMWW_VERSION_NUM' ) ) {
-  define( 'MMWW_VERSION_NUM', '1.0.7' );
+  define( 'MMWW_VERSION_NUM', '1.0.8' );
 }
 /* set up some handy globals */
 if ( ! defined( 'MMWW_THEME_DIR' ) ) {

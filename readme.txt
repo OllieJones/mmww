@@ -30,17 +30,20 @@ Media Metadata Workflow Wizard: Integrate your media metadata workflow with Word
 
 If you create lots of images, graphics, audio clips, or video clips  you probably go to some trouble to put metadata (titles, copyrights, track names, dates, and all that) into them. You may also put tags and ratings (one to five stars) on your media files.
 
-JPEG image files have EXIF metadata. MP3 audio clips have ID3 metadata. PNG files have their own kind of metadata. Adobe is pushing an interoperable standard called XMP to hold metadata as well. Video files also have metadata. If you use a production tool like Acrobat, Adobe Bridge or Audacity, you probably put this kind of metadata into your files. And then you probably rekey it when you put the files into your WordPress site.
+* JPEG image files have EXIF metadata.
+* MP3 audio clips have ID3 metadata.
+* PNG files have their own kind of metadata.
+* Adobe is pushing an interoperable standard called XMP to hold metadata as well.
+
+If you use a production tool like Acrobat, Adobe Bridge or Audacity, you probably put this kind of metadata into your files. And then you probably rekey it when you put the files into your WordPress site.
 
 This Media Metadata Workflow Wizard plugin will get you out of doing that. Now you can have that metadata transferred into the Media Library automatically when you upload your media.
 
-You can choose to have the creation date in your media file used as the "Uploaded" date in WordPress. So, for example, your photos can be ordered in the media library in
-order of the date and time they were taken, and your pdfs in the order they were scanned.
+You can choose to have the creation date in your media file used as the "Uploaded" date in WordPress. So, for example, your photos can be ordered in the media library in order of the date and time they were taken, and your pdfs in the order they were scanned.
 
 You can specify templates defining what metadata items should be used to create each WordPress attachment post's fields: title, caption, alt text, and description.
 
-For audio files, MMWW can automatically create the [audio] shortcode provided by [Jetpack](https://wordpress.org/extend/plugins/jetpack/).
-Choose Link To Media File and the shortcode will be generated for you. WordPress 3.6 and later has an integrated audio player, so you may not need this feature. The Settings page lets you turn this behavior off.
+For audio files, MMWW can automatically create the [audio] shortcode provided by [Jetpack](https://wordpress.org/extend/plugins/jetpack/). Choose Link To Media File and the shortcode will be generated for you. WordPress 3.6 and later has an integrated audio player, so you may not need this feature. The Settings page lets you turn this behavior off.
 
 If you use the [Media Tags][https://wordpress.org/plugins/media-tags/] plugin together with this one, you'll be able to handle metadata tags as a taxonomy. You can also use metadata ratings (one to five stars) as a taxonomy.
 
@@ -73,8 +76,7 @@ MMWW's settings page lets you specify the templates to use for populating the te
      
 and you'll see some details about how, where, and when the photo was taken in your Description.
 
-You can use parentheses to delimit optional parts of a metadata template string. For example, not all media files contain {copyright} metadata.  If you put this into your metadata template string, it will omit the whole copyright clause if there's no {copyright} metadata. Notice that there's a trailing
-space before the closing parenthesis.  This separates this clause (if it appears) from the next one.
+You can use parentheses to delimit optional parts of a metadata template string. For example, not all media files contain {copyright} metadata.  If you put this into your metadata template string, it will omit the whole copyright clause if there's no {copyright} metadata. Notice that there's a trailing space before the closing parenthesis.  This separates this clause (if it appears) from the next one.
 
       (Copyright &copy; {copyright} )
 
@@ -193,11 +195,11 @@ MP3 Audio files can have lots of metadata, defined by the ID3 standard.  The fir
      {title}               Title of the song.
      {album}               Title of the album.
      {credit}              Author or performer.
-     {year}                Year of recording
+     {year}                Year of recording.
      {copyright}           Copyright notice if any is included.
      {description}         Narrative description.
-     {rating}              0 - 5
-     {filename}            Filename of the file. e.g. "TRACK_003" (without .mp3)
+     {rating}              0 - 5.
+     {filename}            Filename of the file. e.g. "TRACK_003" (without .mp3).
 
 
 These metadata items are in the ID3 standard for MP3 files, but most files don't have them.  MMWW handles them
@@ -269,18 +271,14 @@ It's a problem with WordPress, not with MMWW: WordPress doesn't handle TIFFs cor
 WordPress 4.1.1 compatibility.
 
 = 1.0.8 =
-WordPress 5.9 compatibility.
+WordPress 5.9 compatibility, minor bug fixes.
 
 == Upgrade Notice ==
 
- = 1.0.8 =
-Compatibility with WordPress 5.9.
+Compatibility with WordPress 5.9, minor bug fixes.
 
 == Credits ==
 
 Ognjen Djuraskovic of [firstsiteguide.com](https://www.firstsiteguide.com/) has generously provided Serbian and Spanish translations of MMWW. Хвала / Gracias / Thanks Ognjen!
 
-This plugin incorporates the Zend Media Framework by Sven Vollbehr and Ryan Butterfield which they generously made available under the BSD license. It comes in handy for retrieving
-and decoding the ID3 tags from audio files. See the LICENSE.txt file in this distribution.
-
-Copyright (c) 2005-2009 Zend Technologies USA Inc. (https://www.zend.com) Thanks, Sven and Ryan!
+This plugin incorporates the Zend Media Framework by Sven Vollbehr and Ryan Butterfield which they generously made available under the BSD license. It comes in handy for retrieving and decoding the ID3 tags from audio files. See the LICENSE.txt file in this distribution. Copyright (c) 2005-2009 Zend Technologies USA Inc. (https://www.zend.com) Thanks, Sven and Ryan!
