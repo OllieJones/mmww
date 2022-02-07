@@ -7,6 +7,7 @@ class MMWWMedia {
 
   private $post_id = 0;
   private $post = null;
+  private $post_columns;
 
   function __construct() {
     /* set up the various filters etc. */
@@ -24,6 +25,30 @@ class MMWWMedia {
     add_filter( 'wp_read_image_metadata', [ $this, 'read_media_metadata' ], 11, 3 );
     add_filter( 'wp_read_image_metadata', [ $this, 'apply_template_metadata' ], 90, 3 );
 
+    $this->post_columns = [
+      'post_author',
+      'post_date',
+      'post_date_gmt',
+      'post_content',
+      'post_title',
+      'post_excerpt',
+      'post_status',
+      'comment_status',
+      'ping_status',
+      'post_password',
+      'post_name',
+      'to_ping',
+      'pinged',
+      'post_modified',
+      'post_modified_gmt',
+      'post_content_filtered',
+      'post_parent',
+      'guid',
+      'menu_order',
+      'post_type',
+      'post_mime_type',
+      'comment_count',
+    ];
   }
 
   /**
@@ -106,7 +131,7 @@ class MMWWMedia {
    * @param array $meta metadata array
    * @param string $item which template (e.g.  audio_caption)
    *
-   * @return description or caption string
+   * @return string description or caption string
    */
   private function make_string( $meta, $item ) {
     $options = get_option( 'mmww_options' );
@@ -127,7 +152,7 @@ class MMWWMedia {
    * @param array $meta of metadata items including $meta['image_meta']
    * @param int $id attachment id to process
    *
-   * @return usable attachment metadata
+   * @return array usable attachment metadata
    */
   function refetch_metadata( $metadata, $id ) {
     $this->post_id = $id;
@@ -193,7 +218,7 @@ class MMWWMedia {
    * @param array $data attachment data array. Can be an empty array
    * @param int $id attachment id
    *
-   * @return data, modified as needed
+   * @return array data, modified as needed
    */
   function update_metadata( $data, $id ) {
 
@@ -232,14 +257,7 @@ class MMWWMedia {
       }
 
       $updates = $this->get_wp_tags( $updates );
-
-      /* make any updates needed to the posts table. */
-      if ( ! empty ( $updates ) ) {
-        global $wpdb;
-        $where = [ 'ID' => $id ];
-        $wpdb->update( $wpdb->posts, $updates, $where );
-        clean_post_cache( $id );
-      }
+      $this->updatePost($id, $updates);
 
       /* handle the image alt text (screenreader etc) which goes into a postmeta row */
       if ( ! empty( $meta['alt'] ) ) {
@@ -257,9 +275,9 @@ class MMWWMedia {
    * We're using this filter simply to capture the post id.
    *
    * @param $file
-   * @param $id  attachment id
+   * @param $id  int  Attachment id
    *
-   * @return file as altered.
+   * @return string file as altered.
    */
   function update_attached_file( $file, $id ) {
     $this->post_id = $id;
@@ -416,6 +434,31 @@ class MMWWMedia {
     $this->meta_cache_by_filename[ $file ] = $meta;
 
     return $meta;
+  }
+
+  /** update the posts table as needed
+   *
+   * @param $id
+   * @param $updates
+   *
+   * @return void
+   * @noinspection GrazieInspection*/
+  private function updatePost( $id, $updates ) {
+    global $wpdb;
+    if ( empty ( $updates ) ) {
+      return;
+    }
+
+    $fields = [];
+    foreach ( $updates as $key => $value ) {
+      if ( in_array( $key, $this->post_columns ) ) {
+        $fields[ $key ] = $value;
+      }
+    }
+    $where = [ 'ID' => $id ];
+    $wpdb->update( $wpdb->posts, $fields, $where );
+    clean_post_cache( $id );
+
   }
 
   /**
