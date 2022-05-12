@@ -3,6 +3,7 @@ Contributors: olliejones
 Tags: mp3, images, metadata, exif, id3, iptc
 Requires at least: 3.0.1
 Tested up to: 5.9
+Requires PHP: 5.6
 Stable tag: 1.0.8
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -29,17 +30,20 @@ Media Metadata Workflow Wizard: Integrate your media metadata workflow with Word
 
 If you create lots of images, graphics, audio clips, or video clips  you probably go to some trouble to put metadata (titles, copyrights, track names, dates, and all that) into them. You may also put tags and ratings (one to five stars) on your media files.
 
-JPEG image files have EXIF metadata. MP3 audio clips have ID3 metadata. PNG files have their own kind of metadata. Adobe is pushing an interoperable standard called XMP to hold metadata as well. Video files also have metadata. If you use a production tool like Acrobat, Adobe Bridge or Audacity, you probably put this kind of metadata into your files. And then you probably rekey it when you put the files into your WordPress site.
+* JPEG image files have EXIF metadata.
+* MP3 audio clips have ID3 metadata.
+* PNG files have their own kind of metadata.
+* Adobe is pushing an interoperable standard called XMP to hold metadata as well.
+
+If you use a production tool like Acrobat, Adobe Bridge or Audacity, you probably put this kind of metadata into your files. And then you probably rekey it when you put the files into your WordPress site.
 
 This Media Metadata Workflow Wizard plugin will get you out of doing that. Now you can have that metadata transferred into the Media Library automatically when you upload your media.
 
-You can choose to have the creation date in your media file used as the "Uploaded" date in WordPress. So, for example, your photos can be ordered in the media library in
-order of the date and time they were taken, and your pdfs in the order they were scanned.
+You can choose to have the creation date in your media file used as the "Uploaded" date in WordPress. So, for example, your photos can be ordered in the media library in order of the date and time they were taken, and your pdfs in the order they were scanned.
 
 You can specify templates defining what metadata items should be used to create each WordPress attachment post's fields: title, caption, alt text, and description.
 
-For audio files, MMWW can automatically create the [audio] shortcode provided by [Jetpack](https://wordpress.org/extend/plugins/jetpack/).
-Choose Link To Media File and the shortcode will be generated for you. WordPress 3.6 and later has an integrated audio player, so you may not need this feature. The Settings page lets you turn this behavior off.
+For audio files, MMWW can automatically create the [audio] shortcode provided by [Jetpack](https://wordpress.org/extend/plugins/jetpack/). Choose Link To Media File and the shortcode will be generated for you. WordPress 3.6 and later has an integrated audio player, so you may not need this feature. The Settings page lets you turn this behavior off.
 
 If you use the [Media Tags][https://wordpress.org/plugins/media-tags/] plugin together with this one, you'll be able to handle metadata tags as a taxonomy. You can also use metadata ratings (one to five stars) as a taxonomy.
 
@@ -72,8 +76,7 @@ MMWW's settings page lets you specify the templates to use for populating the te
      
 and you'll see some details about how, where, and when the photo was taken in your Description.
 
-You can use parentheses to delimit optional parts of a metadata template string. For example, not all media files contain {copyright} metadata.  If you put this into your metadata template string, it will omit the whole copyright clause if there's no {copyright} metadata. Notice that there's a trailing
-space before the closing parenthesis.  This separates this clause (if it appears) from the next one.
+You can use parentheses to delimit optional parts of a metadata template string. For example, not all media files contain {copyright} metadata.  If you put this into your metadata template string, it will omit the whole copyright clause if there's no {copyright} metadata. Notice that there's a trailing space before the closing parenthesis.  This separates this clause (if it appears) from the next one.
 
       (Copyright &copy; {copyright} )
 
@@ -192,11 +195,11 @@ MP3 Audio files can have lots of metadata, defined by the ID3 standard.  The fir
      {title}               Title of the song.
      {album}               Title of the album.
      {credit}              Author or performer.
-     {year}                Year of recording
+     {year}                Year of recording.
      {copyright}           Copyright notice if any is included.
      {description}         Narrative description.
-     {rating}              0 - 5
-     {filename}            Filename of the file. e.g. "TRACK_003" (without .mp3)
+     {rating}              0 - 5.
+     {filename}            Filename of the file. e.g. "TRACK_003" (without .mp3).
 
 
 These metadata items are in the ID3 standard for MP3 files, but most files don't have them.  MMWW handles them
@@ -258,82 +261,24 @@ It's a problem with WordPress, not with MMWW: WordPress doesn't handle TIFFs cor
 
 
 == Changelog ==
-
-= 0.9.3 =
-
- 1. Metadata extraction working for jpg, png, mp3, pdf files. (There's no metadata in gif files, and tiff files aren't supported by WordPress).
- 1. Integration with the V3.5 media manager is complete.
- 1. Automatic [audio] shortcode insertion working both pre- and post- WordPress 3.5.
- 1. The Settings page allows specification of templates for populating attachment-post fields.
- 
- = 0.9.4 =
- 
- 1. Add support for file ratings set by Windows Explorer and media player.
-
- = 1.0.0 =
-
-Add a PDF filter to the media manager.
-
-Add the reread-metadata function to the media manager.
-
-Add better metadata string templates. You can use parentheses to delimit optional parts of a metadata template string. For example, not all media files contain {copyright} metadata.  If you put this into your metadata template string, it will omit the whole copyright clause if there's no {copyright}.
-
-      (Copyright &copy; {copyright} )
-
-The parentheses denote the whole clause as optional, and omitted if the metadata isn't available. Similarly, you can create a URL that will display a map, but only if latitude and longitude are available, like this:
-
-     (<A href="https://maps.google.com/?ll={latitude},{longitude}&z=18" target="_blank">Map {title}</A>)
-
- = 1.0.1 =
-
-* Jetpack's carousel plugin uses the {aperture} and {shutter_speed} items for photos, so retain them. Document already-existing {iso} and {focal_length} items.
-* Add {focal_length35} item for focal length in 35mm sensor size equivalent
-* Add {altitude} from GPS information.
-* Add {direction} from GPS information. 270M means magnetic west, 180T means true south.
-* Add {scene_capture_type}, {sharpness}, {subject_distance} and {exposurebias}
-
- = 1.0.2 =
-
-A minor upgrade; Captures metadata correctly from PDFs containing multiple XMP chunks, thanks to Kevin Fraser for finding this bug.
-
- = 1.0.3 =
-
-A minor upgrade;
-* Add a {filename} tag for workflows where the filename is needed in the post.
-* Handle some non-ASCII trouble in titles, content, and tags.
-Thanks to Tony van der Voort for reporting these problems.
-
- = 1.0.4 =
-
-Upgrade to WP 3.8.  Add more complete support for IPTC metadata, using {iptc:name} tags.
-
- = 1.0.5 =
-
-Upgrade to WP 3.8.1  Repair defect with exif's {iso} tag. Add Spanish and Serbian translations thanks to Ognjen Djuraskovic.
-
-Tests clean with WP 3.9.
-
- = 1.0.6 =
+= 1.0.6 =
 
 * Upgrade to WP 4.2
 * Add "reread metadata" link to grid view of media per https://core.trac.wordpress.org/ticket/29056
 * Add WordPress-specific tags
       {wp:attachmentid}, {wp:parentid}, {wp:parenttitle}, {wp:parentslug}
 
-Tests clean with WP 4.1.1
+WordPress 4.1.1 compatibility.
+
+= 1.0.8 =
+WordPress 5.9 compatibility, minor bug fixes.
 
 == Upgrade Notice ==
 
- = 1.0.6 =
-Upgrade to WP 4.1.1  Add "reread metadata" link to grid view of media.
+Compatibility with WordPress 5.9, minor bug fixes.
 
 == Credits ==
 
-The stuff the US NSA is collecting isn't really metadata: it's call detail records. This stuff is metadata. Metadata can be poetry.
-
 Ognjen Djuraskovic of [firstsiteguide.com](https://www.firstsiteguide.com/) has generously provided Serbian and Spanish translations of MMWW. Хвала / Gracias / Thanks Ognjen!
 
-This plugin incorporates the Zend Media Framework by Sven Vollbehr and Ryan Butterfield which they generously made available under the BSD license. It comes in handy for retrieving
-and decoding the ID3 tags from audio files. See the LICENSE.txt file in this distribution.
-
-Copyright (c) 2005-2009 Zend Technologies USA Inc. (https://www.zend.com) Thanks, Sven and Ryan!
+This plugin incorporates the Zend Media Framework by Sven Vollbehr and Ryan Butterfield which they generously made available under the BSD license. It comes in handy for retrieving and decoding the ID3 tags from audio files. See the LICENSE.txt file in this distribution. Copyright (c) 2005-2009 Zend Technologies USA Inc. (https://www.zend.com) Thanks, Sven and Ryan!

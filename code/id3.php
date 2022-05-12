@@ -128,7 +128,7 @@ class  MMWWID3Reader {
 			}
 		}
 		catch (Zend_Media_Id3_Exception $e) {
-			$meta['error'] = $e->getMessage() . " ($file)";
+			$meta['error'] = $e->getMessage() . " " . __FILE__;
 		}
 		if ($found) {
 			$meta['format'] = 'audio/mpeg';
