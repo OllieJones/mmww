@@ -149,15 +149,12 @@ class MMWWMedia {
   /**
    * refetch the attachment metadata for non-image file types (audio, PDF, etc)
    *
-   * @param array $meta of metadata items including $meta['image_meta']
    * @param int $id attachment id to process
    *
    * @return array usable attachment metadata
    */
   function refetch_metadata( $metadata, $id ) {
     $this->post_id = $id;
-    $image_meta    = [];
-
     /*
      * Note: sometimes WP asks us to reread the metadata.
      * $this->$meta_cache_by_filename gets us out of doing that,
@@ -183,7 +180,6 @@ class MMWWMedia {
 
     $metadata['image_meta'] = $this->get_wp_tags( $metadata['image_meta'] );
 
-
     return $metadata;
   }
 
@@ -206,7 +202,6 @@ class MMWWMedia {
       $metadata['wp:parentslug']  = $parent->post_name;
 
       return $metadata;
-
     }
 
     return $metadata;
@@ -257,7 +252,7 @@ class MMWWMedia {
       }
 
       $updates = $this->get_wp_tags( $updates );
-      $this->updatePost($id, $updates);
+      $this->updatePost( $id, $updates );
 
       /* handle the image alt text (screenreader etc) which goes into a postmeta row */
       if ( ! empty( $meta['alt'] ) ) {
@@ -297,6 +292,7 @@ class MMWWMedia {
    * @param string $sourceImageType encoding of a few MIME types
    *
    * @return bool|array False on failure. Image metadata array on success.
+   * @noinspection PhpUnusedParameterInspection
    */
   function read_media_metadata( $meta, $file, $sourceImageType ) {
 
@@ -315,7 +311,6 @@ class MMWWMedia {
     $filetype = $this->getfiletype( $filetype );
 
     /* figure out the file's leafname */
-
 
     /* create a media-specific ordered list of metadata readers
      * avoid doing the require operations unless
@@ -375,6 +370,7 @@ class MMWWMedia {
 
     $meta_accum = $this->get_wp_tags( $meta_accum );
 
+    /** @noinspection PhpUnnecessaryLocalVariableInspection */
     $meta = array_merge( $meta, $meta_accum );
 
     /* handle tags */
@@ -392,11 +388,9 @@ class MMWWMedia {
    * @return string basic data type
    */
   private function getfiletype( $f ) {
-    $ff       = explode( '/', $f );
-    $filetype = $ff[0];
-    $filetype = strtolower( $filetype );
+    $ff = explode( '/', $f );
 
-    return $filetype;
+    return strtolower( $ff[0] );
   }
 
   /**
@@ -408,9 +402,10 @@ class MMWWMedia {
    * @param string $sourceImageType encoding of a few MIME types
    *
    * @return bool|array False on failure. Image metadata array on success.
+   * @noinspection PhpUnusedParameterInspection
    */
   function apply_template_metadata( $meta, $file, $sourceImageType ) {
-    if ( empty ( $meta ) && empty ( $meta['mmww_type'] ) ) {
+    if ( empty ( $meta ) || empty ( $meta['mmww_type'] ) ) {
       /* if there's no mmww metadata detected, don't do anything more */
       return $meta;
     }
@@ -442,7 +437,8 @@ class MMWWMedia {
    * @param $updates
    *
    * @return void
-   * @noinspection GrazieInspection*/
+   * @noinspection GrazieInspection
+   */
   private function updatePost( $id, $updates ) {
     global $wpdb;
     if ( empty ( $updates ) ) {
@@ -458,7 +454,6 @@ class MMWWMedia {
     $where = [ 'ID' => $id ];
     $wpdb->update( $wpdb->posts, $fields, $where );
     clean_post_cache( $id );
-
   }
 
   /**

@@ -91,19 +91,21 @@ class MMWWPNGReader {
       return $meta;
     }
 
-    foreach ( $rawTextData as $data ) {
-      $sections = explode( "\0", $data );
+    if ( is_array( $rawTextData ) ) {
+      foreach ( $rawTextData as $data ) {
+        $sections = explode( "\0", $data );
 
-      if ( $sections > 1 ) {
-        $key = array_shift( $sections );
-        if ( array_key_exists( $key, $keylookup ) ) {
-          $key = $keylookup[ $key ];
+        if ( $sections > 1 ) {
+          $key = array_shift( $sections );
+          if ( array_key_exists( $key, $keylookup ) ) {
+            $key = $keylookup[ $key ];
+          } else {
+            $key = strtolower( $key );
+          }
+          $meta[ $key ] = implode( "\0", $sections );
         } else {
-          $key = strtolower( $key );
+          $meta[] = $data;
         }
-        $meta[ $key ] = implode( "\0", $sections );
-      } else {
-        $meta[] = $data;
       }
     }
     /* handle the creation time item */
@@ -120,7 +122,7 @@ class MMWWPNGReader {
   }
 
   private function get_chunks( $type ) {
-    if ( $this->_chunks[ $type ] === null ) {
+    if ( ! array_key_exists( $type, $this->_chunks ) || $this->_chunks[ $type ] === null ) {
       return null;
     }
 

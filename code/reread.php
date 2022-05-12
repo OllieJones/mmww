@@ -1,6 +1,5 @@
 <?php
 
-
 class MMWWRereader {
 
   /**
@@ -28,7 +27,6 @@ class MMWWRereader {
       echo '<div id="message" class="updated"><p>';
       _e( 'Media attachment metadata reloaded from file. Update to save it.', 'mmww' );
       echo '</p></div>';
-
     }
   }
 
@@ -84,7 +82,6 @@ class MMWWRereader {
     delete_post_meta( $post->ID, '_mmww_saved_attachment_metadata' );
 
     return $meta;
-
   }
 
   function store( $post, $meta ) {
@@ -124,7 +121,6 @@ class MMWWRereader {
       $oldmeta['image_meta'] = $newmeta;
       update_post_meta( $id, '_wp_attachment_metadata', $oldmeta );
     }
-
   }
 
   /**
@@ -219,7 +215,7 @@ class MMWWRereader {
         }
       }
       foreach ( $actions as $o => $v ) {
-        $result[ $o ] = $actions[ $o ];
+        $result[ $o ] = $v;
       }
 
       return $result;

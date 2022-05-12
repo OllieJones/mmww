@@ -42,8 +42,8 @@ class MMWWTemplate {
 
         case '(' :
           /* push existing frame, start new one */
-          array_push( $stack, $frame );
-          $frame = [ 'result' => '', 'match' => true ];
+          $stack[] = $frame;
+          $frame   = [ 'result' => '', 'match' => true ];
           break;
 
         case ')':
