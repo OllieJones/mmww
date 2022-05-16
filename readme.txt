@@ -2,29 +2,18 @@
 Contributors: olliejones
 Tags: mp3, images, metadata, exif, id3, iptc
 Requires at least: 3.0.1
-Tested up to: 5.9
+Tested up to: 6.0
 Requires PHP: 5.6
-Stable tag: 1.0.8
+Stable tag: 1.0.9
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: mmww
 Author URI: https://github.com/OllieJones
-Plugin URI: https://plumislandmedia.net/index-wp-mysql-for-speed/
+Plugin URI: https://www.plumislandmedia.net/wordpress-plugins/mmww/
 Github Plugin URI: https://github.com/OllieJones/mmww/
 Primary Branch: main
 
 Media Metadata Workflow Wizard: Integrate your media metadata workflow with WordPress's Media Library
-
-== To Do ==
-
-* Figure out how to put keywords into a taxonomy if that's what the user wants.
-* Add support for the Yet Another Photo Blog (YAPB) [plugin]{https://wordpress.org/extend/plugins/yet-another-photoblog/}
-* Improve the syntax of the templates.
-* Add support for aac and video file metadata.
-* Ask for and receive lots of sample files from users, and use them to test.
-* Come up with a better way to handle commas in metadata when generating audio shortcodes.
-* Figure out a taxonomy to handle the media ratings in XMP.
-* Support TIFF files. (Please let the author know if you need TIFF support.)
 
 == Description ==
 
@@ -270,12 +259,25 @@ It's a problem with WordPress, not with MMWW: WordPress doesn't handle TIFFs cor
 
 WordPress 4.1.1 compatibility.
 
-= 1.0.8 =
-WordPress 5.9 compatibility, minor bug fixes.
+= 1.0.9 =
+WordPress 6.0 compatibility, minor bug fixes.
 
 == Upgrade Notice ==
 
-Compatibility with WordPress 5.9, minor bug fixes.
+Compatibility with WordPress 6.0, minor bug fixes.
+
+== To Do ==
+
+* Figure out how to put keywords into a taxonomy if that's what the user wants.
+* Add support for the Yet Another Photo Blog (YAPB) [plugin]{https://wordpress.org/extend/plugins/yet-another-photoblog/}
+* Improve the syntax of the templates.
+* Add support for aac and video file metadata.
+* Ask for and receive lots of sample files from users, and use them to test.
+* Come up with a better way to handle commas in metadata when generating audio shortcodes.
+* Figure out a taxonomy to handle the media ratings in XMP.
+* Support TIFF files. (Please let the author know if you need TIFF support.)
+
+
 
 == Credits ==
 
