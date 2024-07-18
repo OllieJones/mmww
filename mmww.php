@@ -11,7 +11,7 @@ Description: Use the Media Metadata Workflow Wizard to integrate your media meta
 Author: Ollie Jones
 Version: 1.0.9
 Requires at least: 3.0.1
-Tested up to: 6.0
+Tested up to: 6.6
 Requires PHP: 5.6
 Author URI: https://github.com/OllieJones
 License: GPLv2 or later
