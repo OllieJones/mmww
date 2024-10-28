@@ -25,7 +25,7 @@ class MMWWRereader {
 
       /* we're sure we're displaying the reread-metadata result */
       echo '<div id="message" class="updated"><p>';
-      _e( 'Media attachment metadata reloaded from file. Update to save it.', 'mmww' );
+      esc_html_e( 'Media attachment metadata reloaded from file. Update to save it.', 'mmww' );
       echo '</p></div>';
     }
   }
@@ -292,7 +292,7 @@ class MMWWRereader {
         __( 'Reload Metadata', 'mmww' ) );
 
       $form_fields["my_action"] = [
-        'label'        => __( "" ),
+        'label'        => '',
         'input'        => "html",
         'html'         => $s,
         'show_in_edit' => false,

@@ -14,7 +14,7 @@ class MMWWAdmin {
   }
 
   function admin_actions() {
-    load_plugin_textdomain( 'mmww', MMWW_PLUGIN_DIR, 'languages' );
+    load_plugin_textdomain( 'mmww', '', 'languages' );
     add_options_page( __( 'Media Metadata Workflow Wizard', 'mmww' ),
       __( 'Media Metadata', 'mmww' ),
       'upload_files',
@@ -181,6 +181,7 @@ class MMWWAdmin {
           <div id="icon-plugins" class="icon32"></div>
           <div id="icon-options-general" class="icon32"></div>
         <?php
+        /* translators: 1: semantic version number like 12.34.56 */
         printf( '<div class="wrap"><h2>' . __( 'Media Metadata Workflow Wizard (Version %1s) Settings', 'mmww' ) . '</h2></div>', MMWW_VERSION_NUM );
 
         add_settings_section(

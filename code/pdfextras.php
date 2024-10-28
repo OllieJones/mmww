@@ -16,6 +16,7 @@ class MMWWPDFSupport {
     $post_mime_types['application/pdf'] = [
       __( 'PDFs', 'mmww' ),
       __( 'Manage PDFs', 'mmww' ),
+      /* translators: 1. number of uploaded media files (pdfs). */
       _n_noop( 'PDF <span class="count">(%s)</span>', 'PDFs <span class="count">(%s)</span>', 'mmww' ),
     ];
 
