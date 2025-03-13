@@ -334,6 +334,9 @@ class MMWWMedia {
         break;
 
       case 'application':
+        if ( 'application/pdf' !== $ft['type']  ) {
+          return $meta;
+        }
         /* this is for pdf. Processing below for that */
         break;
 
@@ -437,7 +440,6 @@ class MMWWMedia {
    * @param $updates
    *
    * @return void
-   * @noinspection GrazieInspection
    */
   private function updatePost( $id, $updates ) {
     global $wpdb;
@@ -452,7 +454,9 @@ class MMWWMedia {
       }
     }
     $where = [ 'ID' => $id ];
-    $wpdb->update( $wpdb->posts, $fields, $where );
+    if ( count($fields) > 0) {
+      $wpdb->update( $wpdb->posts, $fields, $where );
+    }
     clean_post_cache( $id );
   }
 

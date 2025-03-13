@@ -2,9 +2,9 @@
 Contributors: olliejones
 Tags: mp3, images, metadata, exif, id3, iptc
 Requires at least: 3.0.1
-Tested up to: 6.7
+Tested up to: 6.8
 Requires PHP: 5.6
-Stable tag: 1.0.10
+Stable tag: 1.0.11
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: mmww
@@ -250,6 +250,18 @@ It's a problem with WordPress, not with MMWW: WordPress doesn't handle TIFFs cor
 
 
 == Changelog ==
+
+= 1.10.11
+
+* Don't try to get metadata from .zip files or other application/whatever files except pdfs.
+* WordPress 6.8
+
+= 1.0.10 =
+Fix some deprecations.
+
+= 1.0.9 =
+WordPress 6.0 compatibility, minor bug fixes.
+
 = 1.0.6 =
 
 * Upgrade to WP 4.2
@@ -259,15 +271,9 @@ It's a problem with WordPress, not with MMWW: WordPress doesn't handle TIFFs cor
 
 WordPress 4.1.1 compatibility.
 
-= 1.0.9 =
-WordPress 6.0 compatibility, minor bug fixes.
-
-= 1.0.10 =
-Fix some deprecations.
-
 == Upgrade Notice ==
 
-Compatibility with WordPress 6.7, removal of some deprecations.
+Compatibility with WordPress 6.8, ignore zip and other non-pdf application files
 
 == To Do ==
 

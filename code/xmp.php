@@ -3,7 +3,7 @@
 
 class MMWWXMPReader {
 
-  private $xmp;
+  private $xmps;
   private $xmp_tag_list = [
     [ 'tags', '//dc:subject/rdf:Bag/rdf:li' ],
   ];
@@ -96,7 +96,7 @@ class MMWWXMPReader {
    *
    * @param string $file file path name
    *
-   * @return array(SimpleXMLElement, position) or false if no XMP was found
+   * @return bool|array(SimpleXMLElement, position) or false if no XMP was found
    */
   private function get_xmp( $file, $start = 0 ) {
     /* find a xmp metadata stanza in the file */
@@ -166,11 +166,11 @@ class MMWWXMPReader {
   /**
    * get a metadata array from an xmp stanza based on a list of itesm
    *
-   * @param string xmps array of xmp stanzas, empty array if none.
-   * @param metadata list $list
-   * @param separator a character for separating list items. default=semicolon.
+   * @param array $xmps array of xmp stanzas, empty array if none.
+   * @param array $list metadata xpaths
+   * @param string $separator a character for separating list items. default=semicolon.
    *
-   * @return multitype:string
+   * @return mixed multitype:string
    */
   private function get_list( $xmps, $list, $separator = ';' ) {
     $result = [];
@@ -207,7 +207,7 @@ class MMWWXMPReader {
 
   /**
    * fetch items of audio metadata from the xmp in an audio file
-   * @return string array of metadata, possibly empty if no metadata found.
+   * @return array of metadata, possibly empty if no metadata found.
    */
   public function get_audio_metadata() {
     return $this->get_list( $this->xmps, $this->audio_metadata_list );
