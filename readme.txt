@@ -1,7 +1,7 @@
 === MMWW ===
 Contributors: olliejones
 Tags: mp3, images, metadata, exif, id3, iptc
-Requires at least: 3.0.1
+Requires at least: 4.6
 Tested up to: 6.8
 Requires PHP: 5.6
 Stable tag: 1.0.11

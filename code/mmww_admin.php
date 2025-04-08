@@ -14,7 +14,6 @@ class MMWWAdmin {
   }
 
   function admin_actions() {
-    load_plugin_textdomain( 'mmww', '', 'languages' );
     add_options_page( __( 'Media Metadata Workflow Wizard', 'mmww' ),
       __( 'Media Metadata', 'mmww' ),
       'upload_files',
