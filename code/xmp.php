@@ -1,6 +1,5 @@
 <?php
 
-
 class MMWWXMPReader {
 
   private $xmps;

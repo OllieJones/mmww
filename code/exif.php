@@ -7,7 +7,7 @@ class MMWWEXIFReader {
     unset ( $this->exif );
     // fetch additional info from exif if available
     if ( is_callable( 'exif_read_data' ) ) {
-      $this->exif = @exif_read_data( $file );
+      $this->exif = @exif_read_data( $file, 'IFD0,FILE,EXIF,COMMENT' , false, false );
     }
   }
 
@@ -32,16 +32,17 @@ class MMWWEXIFReader {
         if ( ! empty( $exif['ImageDescription'] ) ) {
           // Assume the title is stored in ImageDescription
           $tempString    = substr( trim( $exif['ImageDescription'] ), 0, 80 );
-          $meta['title'] = utf8_encode( $tempString );
+          $meta['title'] = mb_convert_encoding( $tempString, 'ISO-8859-1', 'UTF-8' );
           if ( ! empty( $exif['COMPUTED']['UserComment'] ) && trim( $exif['COMPUTED']['UserComment'] ) != $meta['title'] ) {
             $tempString          = trim( $exif['COMPUTED']['UserComment'] );
-            $meta['description'] = utf8_encode( $tempString );
+            $meta['description'] = mb_convert_encoding( $tempString, 'ISO-8859-1', 'UTF-8' );
+          } else {
+            $tempString          = trim( $exif['ImageDescription'] );
+            $meta['description'] = mb_convert_encoding( $tempString, 'ISO-8859-1', 'UTF-8' );
           }
-          $tempString          = trim( $exif['ImageDescription'] );
-          $meta['description'] = utf8_encode( $tempString );
         } elseif ( ! empty( $exif['Comments'] ) ) {
           $tempString          = trim( $exif['Comments'] );
-          $meta['description'] = utf8_encode( $tempString );
+          $meta['description'] = mb_convert_encoding( $tempString, 'ISO-8859-1', 'UTF-8' );
           $meta['title']       = '';
         }
       }
@@ -52,7 +53,7 @@ class MMWWEXIFReader {
       }
 
       if ( ! empty( $exif['Copyright'] ) && strlen( $exif['Copyright'] ) > 0 ) {
-        $meta['copyright'] = utf8_encode( trim( $exif['Copyright'] ) );
+        $meta['copyright'] = mb_convert_encoding(  trim( $exif['Copyright'] ), 'ISO-8859-1', 'UTF-8' );
       }
 
       if ( ( ! empty( $exif['GPSLongitudeRef'] ) ) &&
@@ -93,7 +94,7 @@ class MMWWEXIFReader {
       }
 
       if ( ! empty( $exif['Model'] ) ) {
-        $meta['camera'] = utf8_encode( trim( $exif['Model'] ) );
+        $meta['camera'] = mb_convert_encoding( trim( $exif['Model'] ), 'ISO-8859-1', 'UTF-8' );
       }
 
       if ( ! empty( $exif['DateTimeDigitized'] ) ) {
@@ -102,6 +103,9 @@ class MMWWEXIFReader {
         @date_default_timezone_set( get_option( 'timezone_string' ) );
         $meta['created_timestamp'] = wp_exif_date2ts( $exif['DateTimeDigitized'] );
         @date_default_timezone_set( $previous );
+      }
+      if ( empty( $meth['created_timestamp'] ) && ! empty( $exif['FileDateTime'] ) ) {
+        $meta['created_timestamp'] = $exif['FileDateTime'];
       }
       if ( ! empty( $exif['FocalLength'] ) ) {
         $meta['focal_length'] = wp_exif_frac2dec( $exif['FocalLength'] );

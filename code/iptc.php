@@ -138,7 +138,7 @@ class MMWWIPTCReader {
     if ( $this->is_utf8( $string ) ) {
       return $string;
     } else {
-      return utf8_encode( $string );
+      return mb_convert_encoding( $string, 'ISO-8859-1', 'UTF-8' );
     }
   }
 
