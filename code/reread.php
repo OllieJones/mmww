@@ -72,8 +72,7 @@ class MMWWRereader {
 
   function retrieve_old( $post ) {
     $saved = get_post_meta( $post->ID, '_mmww_saved_attachment_metadata', true );
-    $meta  = [];
-    $meta  = $saved['image_meta'];
+    $meta  = ( is_array( $saved )  && isset( $saved['image_meta'] ) && is_array( $saved['image_meta'] ) ) ? $saved['image_meta'] : array();
     foreach ( $this->fields as $k => $v ) {
       if ( ! empty( $saved[ $k ] ) ) {
         $meta[ $k ] = $saved[ $k ];
@@ -116,7 +115,8 @@ class MMWWRereader {
 
     /* handle the image_meta subfield of the attachment metadata */
     $oldmeta = get_post_meta( $id, '_wp_attachment_metadata', true );
-    if ( array_key_exists( 'image_meta', $oldmeta ) && array_key_exists( 'image_meta', $meta ) ) {
+    if ( isset( $oldmeta['image_meta'] ) && is_array( $oldmeta['image_meta'] )
+         && isset( $meta['image_meta'] ) && is_array( $meta['image_meta'] ) ) {
       $newmeta               = array_merge( $oldmeta['image_meta'], $meta['image_meta'] );
       $oldmeta['image_meta'] = $newmeta;
       update_post_meta( $id, '_wp_attachment_metadata', $oldmeta );
@@ -161,8 +161,11 @@ class MMWWRereader {
 
     $meta['alt']        = get_post_meta( $post->ID, '_wp_attachment_image_alt', true );
     $oldmeta            = get_post_meta( $post->ID, '_wp_attachment_metadata', true );
-    $meta['image_meta'] = $oldmeta['image_meta'];
-
+		if ( is_array ($oldmeta) && isset( $oldmeta['image_meta'] ) && is_array( $oldmeta['image_meta'] )) {
+			$meta['image_meta'] = $oldmeta['image_meta'];
+		} else {
+			$meta['image_meta'] = array();
+		}
     return $meta;
   }
 
