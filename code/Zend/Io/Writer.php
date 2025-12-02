@@ -616,7 +616,7 @@ class Zend_Io_Writer
      *
      * @param string $name  The field name.
      * @param string $value The field value.
-     * @return mixed
+     * @return void
      */
     public function __set($name, $value)
     {

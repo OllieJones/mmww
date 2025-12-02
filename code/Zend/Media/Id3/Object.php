@@ -143,7 +143,7 @@ abstract class Zend_Media_Id3_Object
      *
      * @param string $name  The field name.
      * @param string $value The field value.
-     * @return mixed
+     * @return void
      */
     public function __set($name, $value)
     {
