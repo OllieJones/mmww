@@ -104,7 +104,7 @@ class MMWWEXIFReader {
         $meta['created_timestamp'] = wp_exif_date2ts( $exif['DateTimeDigitized'] );
         @date_default_timezone_set( $previous );
       }
-      if ( empty( $meth['created_timestamp'] ) && ! empty( $exif['FileDateTime'] ) ) {
+      if ( empty( $meta['created_timestamp'] ) && ! empty( $exif['FileDateTime'] ) ) {
         $meta['created_timestamp'] = $exif['FileDateTime'];
       }
       if ( ! empty( $exif['FocalLength'] ) ) {

@@ -284,7 +284,7 @@ class Zend_Io_Writer
      * @param integer $value The input value.
      * @return string
      */
-    private final function _toInt32($value)
+    private function _toInt32($value)
     {
         return pack('l*', $value);
     }

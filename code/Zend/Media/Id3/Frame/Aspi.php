@@ -157,4 +157,13 @@ final class Zend_Media_Id3_Frame_Aspi extends Zend_Media_Id3_Frame
         }
         return false;
     }
+
+	/**
+	 * @param Zend_Io_Writer $writer
+	 *
+	 * @return void
+	 */
+	protected function _writeData( $writer ) {
+		/* Stub writer. */
+	}
 }

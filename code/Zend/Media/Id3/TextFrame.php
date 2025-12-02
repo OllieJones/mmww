@@ -178,7 +178,7 @@ abstract class Zend_Media_Id3_TextFrame extends Zend_Media_Id3_Frame
                 $count = count($this->_text);
                 for ($i = 0; $i < $count; $i++) {
                     $writer->writeString16
-                        ($text, Zend_Io_Writer::LITTLE_ENDIAN_ORDER,
+                        ($this->_text, Zend_Io_Writer::LITTLE_ENDIAN_ORDER,
                          $i == $count ? null : 1);
                 }
                 break;

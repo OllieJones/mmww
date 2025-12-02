@@ -212,7 +212,7 @@ abstract class Zend_Media_Id3_Frame extends Zend_Media_Id3_Object
      *
      * @return integer
      */
-    public final function getSize() 
+    public function getSize()
     {
         return $this->_size; 
     }

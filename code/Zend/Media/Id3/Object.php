@@ -246,7 +246,7 @@ abstract class Zend_Media_Id3_Object
      * @param string $value The input string.
      * @return Array
      */
-    protected final function _explodeString8($value, $limit = null)
+    protected final function _explodeString8($value, $limit = 0)
     {
         return preg_split('/\x00/', $value, $limit);
     }
