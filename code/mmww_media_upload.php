@@ -82,6 +82,9 @@ class MMWWMedia {
    */
   function remove_meaningless_metadata( $meta ) {
 
+		if ( ! is_array( $meta )) {
+			return $meta;
+		}
     /* eliminate redundant items from the metadata  (Jetpack uses 'aperture' and 'shutter_speed')*/
     $tozap = [ 'warning' ];
     foreach ( $tozap as $zap ) {
@@ -92,10 +95,10 @@ class MMWWMedia {
     $keep = [ 'title' => 'yes', 'caption' => 'yes' ];
     foreach ( $meta as $key => $val ) {
       if ( ! array_key_exists( $key, $keep ) ) {
-        if ( is_string( $val ) && strlen( $val ) == 0 ) {
+        if ( is_string( $val ) && 0 === strlen( $val ) ) {
           unset ( $meta[ $key ] );
         }
-        if ( is_numeric( $val ) && $val == 0 ) {
+        if ( 0 === $val ) {
           unset ( $meta[ $key ] );
         }
       }
@@ -105,7 +108,7 @@ class MMWWMedia {
   }
 
   /**
-   * format the metadata according to  templates
+   * format the metadata according to templates
    *
    * @param array $meta
    *
@@ -114,6 +117,9 @@ class MMWWMedia {
   function format_metadata( $meta ) {
     $codes   = [ 'title', 'caption', 'alt', 'displaycaption' ];
     $newmeta = [];
+		if ( ! is_array( $meta ) || ! isset( $meta['mmww_type'] ) ) {
+			return $newmeta;
+		}
     foreach ( $codes as $code ) {
       $codetype = $meta['mmww_type'] . '_' . $code;
       $gen      = $this->make_string( $meta, $codetype );
@@ -126,7 +132,7 @@ class MMWWMedia {
   }
 
   /**
-   * make a desciption or caption string from the metadata and the template
+   * make a description or caption string from the metadata and the template
    *
    * @param array $meta metadata array
    * @param string $item which template (e.g.  audio_caption)
@@ -178,7 +184,9 @@ class MMWWMedia {
       $this->post = get_post( $this->post_id );
     }
 
-    $metadata['image_meta'] = $this->get_wp_tags( $metadata['image_meta'] );
+		if ( isset ( $metadata['image_meta'] ) && is_array ( $metadata['image_meta'] ) ) {
+			$metadata['image_meta'] = $this->get_wp_tags( $metadata['image_meta'] );
+		}
 
     return $metadata;
   }
@@ -267,7 +275,7 @@ class MMWWMedia {
   }
 
   /**
-   * We're using this filter simply to capture the post id.
+   * We're using this filter simply to capture the post id.  HACK HACK
    *
    * @param $file
    * @param $id  int  Attachment id
@@ -276,6 +284,12 @@ class MMWWMedia {
    */
   function update_attached_file( $file, $id ) {
     $this->post_id = $id;
+		$meta = $this->read_media_metadata( array(), $file, null );
+		if ( $id && null !== $meta ) {
+			update_post_meta( $id, '_mmww_saved_attachment_metadata', $meta );
+			$this->meta_cache_by_filename[ $file ] = $meta;
+		}
+
 
     return $file;
   }
@@ -284,8 +298,9 @@ class MMWWMedia {
    * filter to extend the stuff in wp_admin/includes/image.php
    *        and store the metadata in the right place.
    *        This function handles xmp, iptc, exif, png, and id3v2
-   *        This function handles xmp, iptc, exif, png, and id3v2
    *        and so copes pretty well with pdf, mp3, jpg, png etc.
+   *
+   * This doesn't get hooked unless the file is a known type.
    *
    * @param array $meta associative array containing pre-loaded metadata
    * @param string $file file name
