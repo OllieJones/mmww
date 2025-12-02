@@ -133,14 +133,9 @@ class MMWWXMPReader {
       if ( ! ( $e === false ) ) {
         $e += strlen( $te );
         /* found the stanza, use it */
-        $xmp = simplexml_load_string( "<?xml version='1.0'?>\n" . substr( $content, $s, $e - $s ) );
+        $xmp = simplexml_load_string( "<?xml version='1.0'?>\n"
+                                      . substr( $content, $s, $e - $s ) );
 
-        /* deal with the plethora of namespaces in XMP */
-        $ns = $xmp->getNamespaces( true );
-        foreach ( $ns as $key => $val ) {
-          $xmp->registerXPathNamespace( $key, $val );
-        }
-        unset( $ns );
       }
     }
     unset ( $content );
@@ -174,26 +169,28 @@ class MMWWXMPReader {
   private function get_list( $xmps, $list, $separator = ';' ) {
     $result = [];
     foreach ( $xmps as $xmp ) {
-      if ( is_object( $xmp ) ) {
-        foreach ( $list as $pair ) {
-          $tag   = $pair[0];
-          $xpath = $pair[1];
-          /* use @ here to avoid error messages when XML namespaces are unexpected */
-          $it = @$xmp->xpath( $xpath );
-          if ( ! ( $it === false ) ) {
-            $gather = [];
-            foreach ( $it as $s ) {
-              $gather[] = $s;
-            }
-            if ( ! empty( $gather ) ) {
-              $out = implode( $separator, $gather );
-              if ( is_string( $out ) && strlen( $out ) > 0 ) {
-                $result[ $tag ] = $out;
-              }
-            }
-          }
-        }
-      }
+	    if ( is_object( $xmp ) ) {
+		    foreach ( $list as $pair ) {
+			    $tag    = $pair[0];
+			    $xpath  = $pair[1];
+			    $errors = error_reporting();
+			    error_reporting( $errors & ! E_WARNING );
+			    $it = $xmp->xpath( $xpath );
+			    error_reporting( $errors );
+			    if ( ! ( $it === false ) ) {
+				    $gather = [];
+				    foreach ( $it as $s ) {
+					    $gather[] = $s;
+				    }
+				    if ( ! empty( $gather ) ) {
+					    $out = implode( $separator, $gather );
+					    if ( strlen( $out ) > 0 ) {
+						    $result[ $tag ] = $out;
+					    }
+				    }
+			    }
+		    }
+	    }
     }
     if ( array_key_exists( 'iso8601timestamp', $result ) ) {
       /* cope with iso timestamp */
