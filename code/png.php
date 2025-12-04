@@ -43,20 +43,11 @@ class MMWWPNGReader {
 
     while ( $chunkHeader ) {
       // Extract length and type from binary data
-      $chunk = @unpack( 'Nsize/a4type', $chunkHeader );
-
-      // Store position into internal array
-      if ( ! array_key_exists( $chunk['type'], $this->_chunks ) ) {
-        $this->_chunks[ $chunk['type'] ] = [];
-      }
-      $this->_chunks[ $chunk['type'] ][] = [
-        'offset' => ftell( $this->_fp ),
-        'size'   => $chunk['size'],
-      ];
-
+      $chunk           = @unpack( 'Nsize/a4type', $chunkHeader );
+      $chunk['offset'] = ftell( $this->_fp );
+      $this->_chunks[] = $chunk;
       // Skip to next chunk (over body and CRC)
       fseek( $this->_fp, $chunk['size'] + 4, SEEK_CUR );
-
       // Read next chunk header
       $chunkHeader = fread( $this->_fp, 8 );
     }
@@ -84,8 +75,7 @@ class MMWWPNGReader {
       'Copyright'   => 'copyright',
     ];
     try {
-      $png         = $this;
-      $rawTextData = $png->get_chunks( 'tEXt' );
+      $rawTextData = $this->get_chunks( 'tEXt' );
     } catch ( Exception $e ) {
       /* silently ignore failures to read metadata. */
       return $meta;
@@ -93,8 +83,11 @@ class MMWWPNGReader {
 
     if ( is_array( $rawTextData ) ) {
       foreach ( $rawTextData as $data ) {
-        $sections = explode( "\0", $data );
-
+        $sects    = explode( "\0", $data );
+        $sections = array();
+        foreach ( $sects as $sect ) {
+          $sections [] = mb_convert_encoding( $sect, 'ISO-8859-1', 'UTF-8' );
+        }
         if ( $sections > 1 ) {
           $key = array_shift( $sections );
           if ( array_key_exists( $key, $keylookup ) ) {
@@ -102,12 +95,11 @@ class MMWWPNGReader {
           } else {
             $key = strtolower( $key );
           }
-          $meta[ $key ] = implode( "\0", $sections );
-        } else {
-          $meta[] = $data;
+          $meta[ $key ] = implode( '', $sections );
         }
       }
     }
+    /* TODO Handle i18n text. https://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html#C.iTXt */
     /* handle the creation time item */
     if ( array_key_exists( 'creation time', $meta ) ) {
       /* do the timezone stuff right; png creation time is in local time */
@@ -122,18 +114,17 @@ class MMWWPNGReader {
   }
 
   private function get_chunks( $type ) {
-    if ( ! array_key_exists( $type, $this->_chunks ) || $this->_chunks[ $type ] === null ) {
-      return null;
-    }
 
     $chunks = [];
 
-    foreach ( $this->_chunks[ $type ] as $chunk ) {
-      if ( $chunk['size'] > 0 ) {
-        fseek( $this->_fp, $chunk['offset'], SEEK_SET );
-        $chunks[] = fread( $this->_fp, $chunk['size'] );
-      } else {
-        $chunks[] = '';
+    foreach ( $this->_chunks as $chunk ) {
+      if ( $type === $chunk['type'] ) {
+        if ( $chunk['size'] > 0 ) {
+          fseek( $this->_fp, $chunk['offset'], SEEK_SET );
+          $chunks[] = fread( $this->_fp, $chunk['size'] );
+        } else {
+          $chunks[] = '';
+        }
       }
     }
 
