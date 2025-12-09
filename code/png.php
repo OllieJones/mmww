@@ -3,6 +3,7 @@
 /** get metadata from PNG files
  * @link http://stackoverflow.com/questions/2190236/how-can-i-read-png-metadata-from-php
  * @link http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html
+ * @link http://www.schaik.com/pngsuite/
  */
 
 class MMWWPNGReader {
@@ -68,25 +69,59 @@ class MMWWPNGReader {
     if ( $this->_fp == - 1 ) {
       return $meta;
     }
-    $keylookup = [
-      'Description' => 'description',
-      'Author'      => 'credit',
-      'Title'       => 'title',
-      'Copyright'   => 'copyright',
-    ];
+
+    /* Get the image modification time if any. https://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html#C.tIME
+     * We assume big-endian data. */
     try {
-      $rawTextData = $this->get_chunks( 'tEXt' );
+      $raw = $this->get_chunks( 'tIME' );
+    } catch ( Exception $e ) {
+      /* silently ignore failures to read metadata. */
+      return $meta;
+    }
+    if ( is_array( $raw ) ) {
+      foreach ( $raw as $data ) {
+        if ( strlen( $data ) < 7 ) {
+          /* Too short, bail. */
+          continue;
+        }
+        try {
+          $t = @unpack( 'nyear/Cmonth/Cday/Chour/Cmin/Csec', substr( $data, 0, 7 ) );
+          if ( ! $t ) {
+            continue;
+          }
+          $meta['modified_timestamp'] = mktime( $t['hour'], $t['min'], $t['sec'], $t['year'], $t['month'], $t['day'] );;
+        } catch ( Exception $e ) {
+          /* Ignore failures */
+          unset ( $meta ['modified_timestamp'] );
+        }
+      }
+    }
+    $keylookup = [
+      'Description'   => 'description',
+      'Author'        => 'credit',
+      'Title'         => 'title',
+      'Copyright'     => 'copyright',
+      'Creation Time' => 'creation time',
+      'Software'      => 'writer',
+      'Comment'       => 'description',
+      'Device'        => 'camera',
+    ];
+    /* Get the tEXt chunks. https://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html#C.tEXt
+     * Supposedly iso8859-1 text, but some programs jam utf-8 text in them. */
+    try {
+      $raw = $this->get_chunks( 'tEXt' );
     } catch ( Exception $e ) {
       /* silently ignore failures to read metadata. */
       return $meta;
     }
 
-    if ( is_array( $rawTextData ) ) {
-      foreach ( $rawTextData as $data ) {
+    if ( is_array( $raw ) ) {
+      foreach ( $raw as $data ) {
         $sects    = explode( "\0", $data );
         $sections = array();
         foreach ( $sects as $sect ) {
-          $sections [] = mb_convert_encoding( $sect, 'ISO-8859-1', 'UTF-8' );
+          $encoding    = mb_detect_encoding( $sect );
+          $sections [] = $encoding ? mb_convert_encoding( $sect, $encoding, 'UTF-8' ) : $sect;
         }
         if ( $sections > 1 ) {
           $key = array_shift( $sections );
@@ -99,15 +134,59 @@ class MMWWPNGReader {
         }
       }
     }
-    /* TODO Handle i18n text. https://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html#C.iTXt */
+    /* Handle i18n text. https://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html#C.iTXt */
+    /* Get the tEXt chunks. Supposedly iso8859-1 text, but some programs jam utf-8 text in them. */
+    try {
+      $raw = $this->get_chunks( 'iTXt' );
+    } catch ( Exception $e ) {
+      /* silently ignore failures to read metadata. */
+      return $meta;
+    }
+
+    if ( is_array( $raw ) ) {
+      foreach ( $raw as $data ) {
+        $sects = explode( "\0", $data, 2 );
+        if ( count( $sects ) !== 2 ) {
+          /* Bail out. */
+          continue;
+        }
+        $key  = $sects[0];
+        $data = $sects[1];
+        if ( strlen( $data ) < 4 ) {
+          /* Bail out if too short */
+          continue;
+        }
+
+        $compression = @unpack( 'Cflag/Cmethod', substr( $data, 0, 2 ) );
+        if ( 0 !== $compression['flag'] ) {
+          /* Don't attempt to decompress text. */
+          continue;
+        }
+        $data  = substr( $data, 2 );
+        $sects = explode( "\0", $data );
+        if ( count( $sects ) !== 3 ) {
+          /* Bail out if unexpected */
+          continue;
+        }
+        if ( array_key_exists( $key, $keylookup ) ) {
+          $key = $keylookup[ $key ];
+        } else {
+          $key = strtolower( $key );
+        }
+        $meta[ $key ] = $sects[2];
+      }
+    }
+
     /* handle the creation time item */
     if ( array_key_exists( 'creation time', $meta ) ) {
-      /* do the timezone stuff right; png creation time is in local time */
-      $previous = date_default_timezone_get();
-      @date_default_timezone_set( get_option( 'timezone_string' ) );
-      $meta['created_timestamp'] = strtotime( $meta['creation time'] );
-      @date_default_timezone_set( $previous );
-      unset ( $meta['creation time'] );
+      $timestamp = strtotime( $meta['creation time'] );
+      if ( false !== $timestamp ) {
+        $meta['created_timestamp'] = $timestamp;
+        unset ( $meta['creation time'] );
+      }
+    }
+    if ( ! isset( $meta['created_timestamp'] ) && isset( $meta['modified_timestamp'] ) ) {
+      $meta['created_timestamp'] = $meta['modified_timestamp'];
     }
 
     return $meta;
