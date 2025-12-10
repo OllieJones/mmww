@@ -4,7 +4,7 @@ Tags: mp3, images, metadata, exif, id3, iptc
 Requires at least: 4.6
 Tested up to: 6.9
 Requires PHP: 5.6
-Stable tag: 1.0.12
+Stable tag: 2.0.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: mmww
@@ -184,18 +184,22 @@ MP3 Audio files can have lots of metadata, defined by the ID3 standard.  The fir
      {title}               Title of the song.
      {album}               Title of the album.
      {credit}              Author or performer.
+     {artist}              See {credit}
      {year}                Year of recording.
      {copyright}           Copyright notice if any is included.
      {description}         Narrative description.
+     {genre}               Genre.
      {rating}              0 - 5.
      {filename}            Filename of the file. e.g. "TRACK_003" (without .mp3).
+     {fileformat}          "mp3", "aac"
+     {duration}            Length of audio, for example 1:03:22.
+     {mime_type}           "audio/mpeg" or similar.
 
 
 These metadata items are in the ID3 standard for MP3 files, but most files don't have them.  MMWW handles them
 in case your particular media workflow needs them.
 
 	 {tempo}
-	 {genre}
 	 {grouptitle}
 	 {keysignature}
 	 {DDMM}              Day and month of recording
@@ -208,7 +212,6 @@ in case your particular media workflow needs them.
      {creditorganization}
      {mediatype}
      {creditoriginal}
-     {copyright}
 
 = Wordpress information for all files =
 
@@ -251,9 +254,11 @@ It's a problem with WordPress, not with MMWW: WordPress doesn't handle TIFFs cor
 
 == Changelog ==
 
-= 1.0.12 =
+= 2.0.0 =
 
 Compatibility with WordPress 6.9 and php 8.4.
+
+Better .png metadata handling  and support for aac audio.
 
 = 1.10.11
 
@@ -277,19 +282,17 @@ WordPress 4.1.1 compatibility.
 
 == Upgrade Notice ==
 
-Compatibility with WordPress 6.9 and php 8.4.
+This release adds compatibility (and deprecation removal) with WordPress 6.9 and php 8.4. It also adds better .png metadata handling  and support for aac audio.
 
 == To Do ==
 
 * Figure out how to put keywords into a taxonomy if that's what the user wants.
 * Add support for the Yet Another Photo Blog (YAPB) [plugin]{https://wordpress.org/extend/plugins/yet-another-photoblog/}
 * Improve the syntax of the templates.
-* Add support for aac and video file metadata.
+* Add support for video file metadata.
 * Ask for and receive lots of sample files from users, and use them to test.
-* Come up with a better way to handle commas in metadata when generating audio shortcodes.
 * Figure out a taxonomy to handle the media ratings in XMP.
 * Support TIFF files. (Please let the author know if you need TIFF support.)
-
 
 
 == Credits ==

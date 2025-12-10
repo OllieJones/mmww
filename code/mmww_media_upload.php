@@ -2,9 +2,6 @@
 
 class MMWWMedia {
 
-  /** a cache of metadata keyed on the name of the file */
-  private $meta_cache_by_filename = [];
-
   private $post_id = 0;
   private $post = null;
   private $post_columns;
@@ -21,9 +18,12 @@ class MMWWMedia {
     add_filter( 'wp_generate_attachment_metadata', [ $this, 'refetch_metadata' ], 10, 2 );
     add_filter( 'wp_update_attachment_metadata', [ $this, 'update_metadata' ], 10, 2 );
     add_filter( 'update_attached_file', [ $this, 'update_attached_file' ], 10, 2 );
-    /* image metadata readers */
-    add_filter( 'wp_read_image_metadata', [ $this, 'read_media_metadata' ], 11, 3 );
-    add_filter( 'wp_read_image_metadata', [ $this, 'apply_template_metadata' ], 90, 3 );
+    add_filter( 'wp_read_image_metadata', [ $this, 'wp_read_image_metadata' ], 10, 5 );
+    add_filter( 'wp_read_audio_metadata', [ $this, 'wp_read_audio_metadata' ], 10, 4 );
+    add_filter( 'wp_read_video_metadata', [ $this, 'wp_read_video_metadata' ], 10, 4 );
+    /* image metadata readers ... these only fire after handling image metadata. */
+    //TODO put this in refetch_metadata add_filter( 'wp_read_image_metadata', [ $this, 'read_media_metadata' ], 11, 3 );
+    //add_filter( 'wp_read_image_metadata', [ $this, 'apply_template_metadata' ], 90, 3 );
 
     $this->post_columns = [
       'post_author',
@@ -82,9 +82,9 @@ class MMWWMedia {
    */
   function remove_meaningless_metadata( $meta ) {
 
-		if ( ! is_array( $meta )) {
-			return $meta;
-		}
+    if ( ! is_array( $meta ) ) {
+      return $meta;
+    }
     /* eliminate redundant items from the metadata  (Jetpack uses 'aperture' and 'shutter_speed')*/
     $tozap = [ 'warning' ];
     foreach ( $tozap as $zap ) {
@@ -117,9 +117,9 @@ class MMWWMedia {
   function format_metadata( $meta ) {
     $codes   = [ 'title', 'caption', 'alt', 'displaycaption' ];
     $newmeta = [];
-		if ( ! is_array( $meta ) || ! isset( $meta['mmww_type'] ) ) {
-			return $newmeta;
-		}
+    if ( ! is_array( $meta ) || ! isset( $meta['mmww_type'] ) ) {
+      return $newmeta;
+    }
     foreach ( $codes as $code ) {
       $codetype = $meta['mmww_type'] . '_' . $code;
       $gen      = $this->make_string( $meta, $codetype );
@@ -161,42 +161,29 @@ class MMWWMedia {
    */
   function refetch_metadata( $metadata, $id ) {
     $this->post_id = $id;
-    /*
-     * Note: sometimes WP asks us to reread the metadata.
-     * $this->$meta_cache_by_filename gets us out of doing that,
-     * to save file-slurping cpu and io time
-     */
-    if ( ! array_key_exists( 'image_meta', $metadata ) ) {
-      /* no image_meta, we need to get it. */
-      $file = get_attached_file( $id );
-      if ( array_key_exists( $file, $this->meta_cache_by_filename ) ) {
-        $image_meta = $this->meta_cache_by_filename[ $file ];
-      } else {
-        $image_meta = wp_read_image_metadata( $file );
-      }
+    $file          = get_attached_file( $id );
+    $meta          = wp_read_image_metadata( $file );
+    //HACK HACK WTF?
 
-      if ( $image_meta ) {
-        $metadata['image_meta'] = $image_meta;
-      }
-    }
+    $meta = is_array($meta) ? $meta : array();
+    $meta = array_merge( $metadata, $meta );
 
     if ( 0 != $this->post_id ) {
       $this->post = get_post( $this->post_id );
     }
+    $this->get_wp_tags( $meta );
 
-		if ( isset ( $metadata['image_meta'] ) && is_array ( $metadata['image_meta'] ) ) {
-			$metadata['image_meta'] = $this->get_wp_tags( $metadata['image_meta'] );
-		}
-
-    return $metadata;
+    return $meta;
   }
 
   /**
-   * @param $metadata
+   * Load tags like wp:attachmentid and wp:parenttitle into the metadata.
    *
-   * @return mixed
+   * @param array $metadata
+   *
+   * @return void
    */
-  private function get_wp_tags( $metadata ) {
+  private function get_wp_tags( &$metadata ) {
     if ( $this->post_id > 0 ) {
       /* store the post id for the attachment as {wp:attachmentid} */
       $metadata['wp:attachmentid'] = $this->post_id;
@@ -209,10 +196,7 @@ class MMWWMedia {
       $metadata['wp:parenttitle'] = $parent->post_title;
       $metadata['wp:parentslug']  = $parent->post_name;
 
-      return $metadata;
     }
-
-    return $metadata;
   }
 
   /**
@@ -259,10 +243,10 @@ class MMWWMedia {
         @date_default_timezone_set( $previous );
       }
 
-      $updates = $this->get_wp_tags( $updates );
+      $this->get_wp_tags( $updates );
       $this->updatePost( $id, $updates );
 
-      /* handle the image alt text (screenreader etc) which goes into a postmeta row */
+      /* handle the image alt text (screenreader etc.) which goes into a postmeta row */
       if ( ! empty( $meta['alt'] ) ) {
         update_post_meta( $id, '_wp_attachment_image_alt', $meta['alt'] );
       }
@@ -284,15 +268,128 @@ class MMWWMedia {
    */
   function update_attached_file( $file, $id ) {
     $this->post_id = $id;
-		$meta = $this->read_media_metadata( array(), $file, null );
-		if ( $id && null !== $meta ) {
-			update_post_meta( $id, '_mmww_saved_attachment_metadata', $meta );
-			$this->meta_cache_by_filename[ $file ] = $meta;
-		}
+    // hack hack $meta          = $this->read_media_metadata( array(), $file, null );
+    //if ( $id && null !== $meta ) {
+    //  update_post_meta( $id, '_mmww_saved_attachment_metadata', $meta );
+    //  $this->meta_cache_by_filename[ $file ] = $meta;
+    //}
 
 
     return $file;
   }
+
+  /**
+   * Filters the array of metadata read from an image's exif data.
+   *
+   * @param array $meta Image meta data.
+   * @param string $file Path to image file.
+   * @param int $image_type Type of image, one of the `IMAGETYPE_XXX` constants. 2 for jpg
+   * @param array $iptc IPTC data.
+   * @param array $exif EXIF data.
+   *
+   * @since 5.0.0 The `$exif` parameter was added.
+   *
+   * @since 2.5.0
+   * @since 4.4.0 The `$iptc` parameter was added.
+   */
+  public function wp_read_image_metadata( $meta, $file, $image_type, $iptc, $exif ) {
+    switch ( $image_type ) {
+      case IMAGETYPE_JPEG:
+        break;
+      case IMAGETYPE_PNG;
+        require_once 'png.php';
+        $reader = new MMWWPNGReader( $file );
+        $meta   = $reader->get_metadata();
+
+
+        break;
+      default:
+        break;
+    }
+
+
+    /*  require_once 'exif.php';
+      require_once 'iptc.php';
+      $readers[] = new MMWWEXIFReader( $file );
+      require_once 'png.php';
+      $readers[] = new MMWWPNGReader( $file );
+      $readers[] = new MMWWIPTCReader( $file ); */
+
+
+    return $meta;   //TODO stub
+  }
+
+  /**
+   * Filters the array of metadata retrieved from an audio file.
+   *
+   * In core, usually this selection is what is stored.
+   * More complete data can be parsed from the `$data` parameter.
+   *
+   * @param array $metadata Filtered audio metadata.
+   * @param string $file Path to audio file.
+   * @param string|null $file_format File format of audio, as analyzed by getID3.
+   *                                 Null if unknown.
+   * @param array $data Raw metadata from getID3.
+   *
+   * @since 6.1.0
+   *
+   */
+  public function wp_read_audio_metadata( $metadata, $file, $file_format, $data ) {
+    $metadata['filename'] = pathinfo( $file, PATHINFO_FILENAME );
+
+    if ( 'mp4' === $file_format ) {
+      if ( is_array( $data['tags']['quicktime'] ) ) {
+        $s = &$data['tags']['quicktime'];
+        foreach ( $s as $tag => $val_item ) {
+          if ( ! isset( $metadata[ $tag ] ) ) {
+            if ( is_array( $val_item ) && is_string( $val_item[0] ) ) {
+              $metadata[ $tag ] = $val_item[0];
+            }
+          }
+        }
+      }
+      if ( isset( $metadata['creation_date'] ) && is_numeric( $metadata['creation_date'] ) ) {
+        $this->copy_string_item( $metadata, 'creation_date', 'year' );
+      }
+    }
+    $this->copy_string_item( $metadata, 'length_formatted', 'duration' );
+    $this->copy_string_item( $metadata, 'artist', 'author' );
+    $this->copy_string_item( $metadata, 'author', 'artist' );
+
+
+    return $metadata;
+  }
+
+  private function copy_string_item( &$array, $fr, $to, $source_array = null ) {
+    $source_array = ( null === $source_array ) ? $array : $source_array;
+    if ( ! is_array( $array ) ) {
+      return;
+    }
+    if ( is_array( $source_array ) && isset( $source_array[ $fr ] ) && is_string( $source_array[ $fr ] ) && ! isset( $array[ $to ] ) ) {
+      $array[ $to ] = $source_array[ $fr ];
+    }
+  }
+
+
+  /**
+   * Filters the array of metadata retrieved from a video.
+   *
+   *  In core, usually this selection is what is stored.
+   *  More complete data can be parsed from the `$data` parameter.
+   *
+   * @param array $metadata Filtered video metadata.
+   * @param string $file Path to video file.
+   * @param string|null $file_format File format of video, as analyzed by getID3.
+   *                                  Null if unknown.
+   * @param array $data Raw metadata from getID3.
+   *
+   * @since 4.9.0
+   *
+   */
+  public function wp_read_video_metadata( $metadata, $file, $file_format, $data ) {
+    return $metadata;
+  }
+
 
   /**
    * filter to extend the stuff in wp_admin/includes/image.php
@@ -334,10 +431,6 @@ class MMWWMedia {
      */
     $readers = [];
     switch ( $filetype ) {
-      case 'audio':
-        require_once 'id3.php';
-        $readers[] = new MMWWID3Reader( $file );
-        break;
 
       case 'image':
         require_once 'exif.php';
@@ -349,7 +442,7 @@ class MMWWMedia {
         break;
 
       case 'application':
-        if ( 'application/pdf' !== $ft['type']  ) {
+        if ( 'application/pdf' !== $ft['type'] ) {
           return $meta;
         }
         /* this is for pdf. Processing below for that */
@@ -381,12 +474,12 @@ class MMWWMedia {
       }
     }
 
-    if ( 0 == $this->post_id ) {
+    if ( 0 === $this->post_id ) {
       $this->post_id = $GLOBALS['post_id'];
       $this->post    = get_post( $this->post_id );
     }
 
-    $meta_accum = $this->get_wp_tags( $meta_accum );
+    $this->get_wp_tags( $meta_accum );
 
     /** @noinspection PhpUnnecessaryLocalVariableInspection */
     $meta = array_merge( $meta, $meta_accum );
@@ -469,14 +562,14 @@ class MMWWMedia {
       }
     }
     $where = [ 'ID' => $id ];
-    if ( count($fields) > 0) {
+    if ( count( $fields ) > 0 ) {
       $wpdb->update( $wpdb->posts, $fields, $where );
     }
     clean_post_cache( $id );
   }
 
   /**
-   * get an html table made of an item's metadata
+   * get a html table made of an item's metadata
    *
    * @param array $meta of metadata strings
    *
