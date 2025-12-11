@@ -4,7 +4,6 @@ class MMWWMedia {
 
   private $post_id = 0;
   private $post = null;
-  private $post_columns;
 
   function __construct() {
     /* set up the various filters etc. */
@@ -15,40 +14,18 @@ class MMWWMedia {
     /* metadata display filters; internal to mmww */
     add_filter( 'mmww_format_metadata', [ $this, 'format_metadata' ], 12, 1 );
     /* attachment metadata specific */
-    add_filter( 'wp_generate_attachment_metadata', [ $this, 'refetch_metadata' ], 10, 2 );
+    add_filter( 'wp_generate_attachment_metadata', [ $this, 'refetch_metadata' ], 10, 3 );
     add_filter( 'wp_update_attachment_metadata', [ $this, 'update_metadata' ], 10, 2 );
+    add_filter( 'wp_update_attachment_metadata', [ $this, 'apply_template_metadata' ], 10, 60 );
+
     add_filter( 'update_attached_file', [ $this, 'update_attached_file' ], 10, 2 );
+    /* Media object type filers */
     add_filter( 'wp_read_image_metadata', [ $this, 'wp_read_image_metadata' ], 10, 5 );
     add_filter( 'wp_read_audio_metadata', [ $this, 'wp_read_audio_metadata' ], 10, 4 );
     add_filter( 'wp_read_video_metadata', [ $this, 'wp_read_video_metadata' ], 10, 4 );
     /* image metadata readers ... these only fire after handling image metadata. */
     //TODO put this in refetch_metadata add_filter( 'wp_read_image_metadata', [ $this, 'read_media_metadata' ], 11, 3 );
-    //add_filter( 'wp_read_image_metadata', [ $this, 'apply_template_metadata' ], 90, 3 );
 
-    $this->post_columns = [
-      'post_author',
-      'post_date',
-      'post_date_gmt',
-      'post_content',
-      'post_title',
-      'post_excerpt',
-      'post_status',
-      'comment_status',
-      'ping_status',
-      'post_password',
-      'post_name',
-      'to_ping',
-      'pinged',
-      'post_modified',
-      'post_modified_gmt',
-      'post_content_filtered',
-      'post_parent',
-      'guid',
-      'menu_order',
-      'post_type',
-      'post_mime_type',
-      'comment_count',
-    ];
   }
 
   /**
@@ -155,25 +132,27 @@ class MMWWMedia {
   /**
    * refetch the attachment metadata for non-image file types (audio, PDF, etc)
    *
+   * @param $metadata
    * @param int $id attachment id to process
+   * @param string $context Additional context. Can be 'create' when metadata was initially created for new attachment
+   *                               or 'update' when the metadata was updated.
    *
    * @return array usable attachment metadata
    */
-  function refetch_metadata( $metadata, $id ) {
+  function refetch_metadata( $metadata, $id, $context ) {
     $this->post_id = $id;
     $file          = get_attached_file( $id );
-    $meta          = wp_read_image_metadata( $file );
-    //HACK HACK WTF?
-
-    $meta = is_array($meta) ? $meta : array();
-    $meta = array_merge( $metadata, $meta );
-
-    if ( 0 != $this->post_id ) {
+    if ( is_array( $metadata['image_meta'])) {
+      $new_image_meta         = wp_read_image_metadata( $file );
+      $new_image_meta         = is_array( $new_image_meta ) ? $new_image_meta : array();
+      $metadata['image_meta'] = array_merge( $metadata['image_meta'], $new_image_meta );
+    }
+    if ( $this->post_id ) {
       $this->post = get_post( $this->post_id );
     }
-    $this->get_wp_tags( $meta );
+    $this->get_wp_tags( $metadata );
 
-    return $meta;
+    return $metadata;
   }
 
   /**
@@ -212,7 +191,7 @@ class MMWWMedia {
     $this->post_id = $id;
     if ( ! empty ( $data ) && array_key_exists( 'image_meta', $data ) ) {
       $meta    = $data['image_meta'];
-      $updates = [];
+      $updates = [ 'ID' => $id ];
 
       /* handle the caption for photos, which goes into wp_posts.post_excerpt. */
       if ( ! empty( $meta['displaycaption'] ) ) {
@@ -232,7 +211,7 @@ class MMWWMedia {
          * That is, for example, the incoming timestamp may have been when daylight
          * savings time was in force, but that may not be true at time=now.
          * Hence this monkey business with saving and restoring the
-         * default timezone.
+         * default timezone.   //TODO this is probably overwrought.
          */
         $previous = date_default_timezone_get();
         @date_default_timezone_set( get_option( 'timezone_string' ) );
@@ -243,23 +222,19 @@ class MMWWMedia {
         @date_default_timezone_set( $previous );
       }
 
-      $this->get_wp_tags( $updates );
-      $this->updatePost( $id, $updates );
+      wp_update_post( $updates );
 
       /* handle the image alt text (screenreader etc.) which goes into a postmeta row */
       if ( ! empty( $meta['alt'] ) ) {
         update_post_meta( $id, '_wp_attachment_image_alt', $meta['alt'] );
       }
-
-      /* stash tne metadata itself so we don't have to reread it from the file for site visitors */
-      // need this? update_post_meta ($id, MMWW_POSTMETA_KEY, json_encode($meta));
     }
 
     return $data;
   }
 
   /**
-   * We're using this filter simply to capture the post id.  HACK HACK
+   * We're using this filter simply to capture the post id.
    *
    * @param $file
    * @param $id  int  Attachment id
@@ -268,13 +243,6 @@ class MMWWMedia {
    */
   function update_attached_file( $file, $id ) {
     $this->post_id = $id;
-    // hack hack $meta          = $this->read_media_metadata( array(), $file, null );
-    //if ( $id && null !== $meta ) {
-    //  update_post_meta( $id, '_mmww_saved_attachment_metadata', $meta );
-    //  $this->meta_cache_by_filename[ $file ] = $meta;
-    //}
-
-
     return $file;
   }
 
@@ -294,17 +262,22 @@ class MMWWMedia {
    */
   public function wp_read_image_metadata( $meta, $file, $image_type, $iptc, $exif ) {
     switch ( $image_type ) {
-      case IMAGETYPE_JPEG:
-        break;
       case IMAGETYPE_PNG;
         require_once 'png.php';
         $reader = new MMWWPNGReader( $file );
         $meta   = $reader->get_metadata();
 
-
         break;
       default:
         break;
+    }
+
+    if ( is_array( $exif ) && count( $exif ) > 0 ) {
+      $this->get_exif( $meta, $exif );
+    }
+
+    if ( is_array( $iptc ) && count( $iptc ) > 0 ) {
+      $this->get_iptc( $meta, $iptc );
     }
 
 
@@ -315,8 +288,7 @@ class MMWWMedia {
       $readers[] = new MMWWPNGReader( $file );
       $readers[] = new MMWWIPTCReader( $file ); */
 
-
-    return $meta;   //TODO stub
+    return wp_kses_post_deep( $meta );
   }
 
   /**
@@ -410,11 +382,6 @@ class MMWWMedia {
 
     if ( ! file_exists( $file ) ) {
       return $meta;
-    }
-
-    /* if the metadata is cached, return it right away */
-    if ( array_key_exists( $file, $this->meta_cache_by_filename ) ) {
-      return $this->meta_cache_by_filename[ $file ];
     }
 
     /* figure out the filetype */
@@ -521,11 +488,6 @@ class MMWWMedia {
       return $meta;
     }
 
-    /* if the metadata is cached, return it right away */
-    if ( array_key_exists( $file, $this->meta_cache_by_filename ) ) {
-      return $this->meta_cache_by_filename[ $file ];
-    }
-
     $cleanmeta = apply_filters( 'mmww_filter_metadata', $meta );
 
     /* $meta[caption] goes into wp_posts.post_content. This is shown as "description" in the UI.
@@ -536,36 +498,8 @@ class MMWWMedia {
     $newmeta = apply_filters( 'mmww_format_metadata', $cleanmeta );
 
     $meta = array_merge( $cleanmeta, $newmeta );
-    /* cache the resulting metadata */
-    $this->meta_cache_by_filename[ $file ] = $meta;
 
     return $meta;
-  }
-
-  /** update the posts table as needed
-   *
-   * @param $id
-   * @param $updates
-   *
-   * @return void
-   */
-  private function updatePost( $id, $updates ) {
-    global $wpdb;
-    if ( empty ( $updates ) ) {
-      return;
-    }
-
-    $fields = [];
-    foreach ( $updates as $key => $value ) {
-      if ( in_array( $key, $this->post_columns ) ) {
-        $fields[ $key ] = $value;
-      }
-    }
-    $where = [ 'ID' => $id ];
-    if ( count( $fields ) > 0 ) {
-      $wpdb->update( $wpdb->posts, $fields, $where );
-    }
-    clean_post_cache( $id );
   }
 
   /**
@@ -585,6 +519,297 @@ class MMWWMedia {
     $string .= '</table>' . "\n";
 
     return $string;
+  }
+
+  public function get_iptc ($meta, $exif ) {
+    return;  //stub
+  }
+
+  public function get_exif( &$meta, $exif ) {
+
+    if ( ! empty( $exif ) ) {
+
+      if ( ! empty ( $exif['UndefinedTag:0xEA1C'] ) &&
+           ! empty( $exif['Title'] ) && $exif['Title'][0] == chr( 0x3f )
+      ) {
+
+        $meta['warning'] = __( 'EXIF metadata corrupted by Microsoft Windows properties defect', 'mmww' );
+
+        /* deal with the bogus junk that MS's property editor puts into EXIF  */
+        if ( ! empty( $exif['ImageDescription'] ) ) {
+          // Assume the title is stored in ImageDescription
+          $tempString    = substr( trim( $exif['ImageDescription'] ), 0, 80 );
+          $meta['title'] = mb_convert_encoding( $tempString, 'ISO-8859-1', 'UTF-8' );
+          if ( ! empty( $exif['COMPUTED']['UserComment'] ) && trim( $exif['COMPUTED']['UserComment'] ) != $meta['title'] ) {
+            $tempString          = trim( $exif['COMPUTED']['UserComment'] );
+            $meta['description'] = mb_convert_encoding( $tempString, 'ISO-8859-1', 'UTF-8' );
+          } else {
+            $tempString          = trim( $exif['ImageDescription'] );
+            $meta['description'] = mb_convert_encoding( $tempString, 'ISO-8859-1', 'UTF-8' );
+          }
+        } elseif ( ! empty( $exif['Comments'] ) ) {
+          $tempString          = trim( $exif['Comments'] );
+          $meta['description'] = mb_convert_encoding( $tempString, 'ISO-8859-1', 'UTF-8' );
+          $meta['title']       = '';
+        }
+      }
+
+      /* do the version */
+      if ( ! empty( $exif['ExifVersion'] ) ) {
+        $meta['exifversion'] = floatval( $exif['ExifVersion'] ) / 100 . '';
+      }
+
+      if ( ( ! empty( $exif['GPSLongitudeRef'] ) ) &&
+           ( ! empty( $exif['GPSLongitude'] ) ) &&
+           ( ! empty( $exif['GPSLatitudeRef'] ) ) &&
+           ( ! empty( $exif['GPSLatitude'] ) )
+      ) {
+        // looks like we have valid lat/long data
+        $meta['longitude'] = $this->getGPS( $exif['GPSLongitudeRef'], $exif['GPSLongitude'] );
+        $meta['latitude']  = $this->getGPS( $exif['GPSLatitudeRef'], $exif['GPSLatitude'] );
+      }
+
+      if ( ! empty( $exif['GPSAltitude'] ) ) {
+        $meta['altitude'] = round( wp_exif_frac2dec( $exif['GPSAltitude'] ), 1 );
+      }
+
+      if ( ! empty ( $meta['altitude'] ) && ! empty( $exif['GPSAltitudeRef'] ) ) {
+        if ( intval( $exif['GPSAltitudeRef'] ) != 0 ) {
+          $meta['altitude'] = '-' . $meta['altitude'];
+        }
+      }
+
+      if ( ! empty( $exif['SubjectDistance'] ) ) {
+        $meta['subject_distance'] = round( wp_exif_frac2dec( $exif['SubjectDistance'] ), 1 );
+      }
+
+      if ( ! empty( $exif['ExposureBiasValue'] ) ) {
+        $meta['exposure_bias'] = round( wp_exif_frac2dec( $exif['ExposureBiasValue'] ), 1 );
+      }
+
+      if ( ! empty( $exif['GPSImgDirection'] ) ) {
+        $meta['direction'] = round( wp_exif_frac2dec( $exif['GPSImgDirection'] ), 1 );
+      }
+
+      /* T for true or M for magnetic direction */
+      if ( ! empty( $meta['direction'] ) && ! empty( $exif['GPSImgDirectionRef'] ) ) {
+        $meta['direction'] .= $exif['GPSImgDirectionRef'];
+      }
+
+      if ( ! empty( $exif['DateTimeDigitized'] ) ) {
+        /* do the timezone stuff right; camera metadata is in local time */   //TODO UndefinedTag:0x9012 has the tz offset.
+        $previous = date_default_timezone_get();
+        @date_default_timezone_set( get_option( 'timezone_string' ) );
+        $meta['created_timestamp'] = wp_exif_date2ts( $exif['DateTimeDigitized'] );
+        @date_default_timezone_set( $previous );
+      }
+      if ( empty( $meta['created_timestamp'] ) && ! empty( $exif['FileDateTime'] ) ) {
+        $meta['created_timestamp'] = $exif['FileDateTime'];
+      }
+      if ( ! empty( $exif['FocalLength'] ) ) {
+        $meta['focal_length'] = wp_exif_frac2dec( $exif['FocalLength'] );
+      }
+
+      if ( ! empty( $exif['FocalLengthIn35mmFilm'] ) ) {
+        $meta['focal_length35'] = wp_exif_frac2dec( $exif['FocalLengthIn35mmFilm'] );
+      }
+
+      if ( array_key_exists( 'Flash', $exif ) ) {
+        /* translators: renderings of the EXIF flash codes*/
+        $flash_data    = [
+          0x0  => _x( 'No Flash', 'flash', 'mmww' ),
+          0x1  => _x( 'Fired', 'flash', 'mmww' ),
+          0x5  => _x( 'Fired, Return not detected', 'flash', 'mmww' ),
+          0x7  => _x( 'Fired, Return detected', 'flash', 'mmww' ),
+          0x8  => _x( 'On, Did not fire', 'flash', 'mmww' ),
+          0x9  => _x( 'On, Fired', 'flash', 'mmww' ),
+          0xd  => _x( 'On, Return not detected', 'flash', 'mmww' ),
+          0xf  => _x( 'On, Return detected', 'flash', 'mmww' ),
+          0x10 => _x( 'Off, Did not fire', 'flash', 'mmww' ),
+          0x14 => _x( 'Off, Did not fire, Return not detected', 'flash', 'mmww' ),
+          0x18 => _x( 'Auto, Did not fire', 'flash', 'mmww' ),
+          0x19 => _x( 'Auto, Fired', 'flash', 'mmww' ),
+          0x1d => _x( 'Auto, Fired, Return not detected', 'flash', 'mmww' ),
+          0x1f => _x( 'Auto, Fired, Return detected', 'flash', 'mmww' ),
+          0x20 => _x( 'No flash function', 'flash', 'mmww' ),
+          0x30 => _x( 'Off, No flash function', 'flash', 'mmww' ),
+          0x41 => _x( 'Fired, Red-eye reduction', 'flash', 'mmww' ),
+          0x45 => _x( 'Fired, Red-eye reduction, Return not detected', 'flash', 'mmww' ),
+          0x47 => _x( 'Fired, Red-eye reduction, Return detected', 'flash', 'mmww' ),
+          0x49 => _x( 'On, Red-eye reduction', 'flash', 'mmww' ),
+          0x4d => _x( 'On, Red-eye reduction, Return not detected', 'flash', 'mmww' ),
+          0x4f => _x( 'On, Red-eye reduction, Return detected', 'flash', 'mmww' ),
+          0x50 => _x( 'Off, Red-eye reduction', 'flash', 'mmww' ),
+          0x58 => _x( 'Auto, Did not fire, Red-eye reduction', 'flash', 'mmww' ),
+          0x59 => _x( 'Auto, Fired, Red-eye reduction', 'flash', 'mmww' ),
+          0x5d => _x( 'Auto, Fired, Red-eye reduction, Return not detected', 'flash', 'mmww' ),
+          0x5f => _x( 'Auto, Fired, Red-eye reduction, Return detected', 'flash', 'mmww' ),
+        ];
+        $meta['flash'] = $flash_data[ intval( $exif['Flash'] ) ];
+      }
+
+      if ( array_key_exists( 'SceneCaptureType', $exif ) ) {
+        /* translators: renderings of the EXIF scene capture type http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html*/
+        $scenecap_data              = [
+          0 => _x( 'Standard', 'scene_capture_type', 'mmww' ),
+          1 => _x( 'Landscape', 'scene_capture_type', 'mmww' ),
+          2 => _x( 'Portrait', 'scene_capture_type', 'mmww' ),
+          3 => _x( 'Night', 'scene_capture_type', 'mmww' ),
+        ];
+        $meta['scene_capture_type'] = $scenecap_data[ intval( $exif['SceneCaptureType'] ) ];
+      }
+
+      if ( array_key_exists( 'Sharpness', $exif ) ) {
+        /* translators: renderings of the EXIF sharpness type http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html*/
+        $sharp_data        = [
+          0 => _x( 'Normal', 'sharpness', 'mmww' ),
+          1 => _x( 'Soft', 'sharpness', 'mmww' ),
+          2 => _x( 'Hard', 'sharpness', 'mmww' ),
+        ];
+        $meta['sharpness'] = $sharp_data[ intval( $exif['Sharpness'] ) ];
+      }
+
+      if ( array_key_exists( 'LightSource', $exif ) ) {
+        /* translators: renderings of the EXIF light source codes http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html#LightSource*/
+        $light_source_data   = [
+          0   => _x( 'Unknown', 'light_source', 'mmww' ),
+          1   => _x( 'Daylight', 'light_source', 'mmww' ),
+          2   => _x( 'Fluorescent', 'light_source', 'mmww' ),
+          3   => _x( 'Tungsten', 'light_source', 'mmww' ),
+          4   => _x( 'Flash', 'light_source', 'mmww' ),
+          9   => _x( 'Fine weather', 'light_source', 'mmww' ),
+          10  => _x( 'Cloudy weather', 'light_source', 'mmww' ),
+          11  => _x( 'Shade', 'light_source', 'mmww' ),
+          12  => _x( 'Daylight fluorescent', 'light_source', 'mmww' ),
+          13  => _x( 'Day white fluorescent', 'light_source', 'mmww' ),
+          14  => _x( 'Cool white fluorescent', 'light_source', 'mmww' ),
+          15  => _x( 'White fluorescent', 'light_source', 'mmww' ),
+          17  => _x( 'Standard light A', 'light_source', 'mmww' ),
+          18  => _x( 'Standard light B', 'light_source', 'mmww' ),
+          19  => _x( 'Standard light C', 'light_source', 'mmww' ),
+          20  => _x( 'D55', 'light_source', 'mmww' ),
+          21  => _x( 'D65', 'light_source', 'mmww' ),
+          22  => _x( 'D75', 'light_source', 'mmww' ),
+          23  => _x( 'D50', 'light_source', 'mmww' ),
+          24  => _x( 'ISO studio tungsten', 'light_source', 'mmww' ),
+          255 => _x( 'Other light source', 'light_source', 'mmww' ),
+        ];
+        $meta['lightsource'] = $light_source_data[ intval( $exif['LightSource'] ) ];
+      }
+
+      if ( array_key_exists( 'MeteringMode', $exif ) ) {
+        /* translators: these are human-readable renderings of the EXIF metering mode codes */
+        $metering_mode_data   = [
+          0   => _x( 'Unknown', 'metering_mode', 'mmww' ),
+          1   => _x( 'Average', 'metering_mode', 'mmww' ),
+          2   => _x( 'Center weighted average', 'metering_mode', 'mmww' ),
+          3   => _x( 'Spot', 'metering_mode', 'mmww' ),
+          4   => _x( 'Multi Spot', 'metering_mode', 'mmww' ),
+          5   => _x( 'Pattern', 'metering_mode', 'mmww' ),
+          6   => _x( 'Partial', 'metering_mode', 'mmww' ),
+          255 => _x( 'Other', 'metering_mode', 'mmww' ),
+        ];
+        $meta['meteringmode'] = $metering_mode_data[ intval( $exif['MeteringMode'] ) ];
+      }
+
+      if ( array_key_exists( 'SensingMethod', $exif ) ) {
+        /* translators: these are human-readable renderings of the EXIF sensor type codes */
+        $sensing_method_data   = [
+          2 => _x( 'One-chip color area sensor', 'sensing_method', 'mmww' ),
+          3 => _x( 'Two-chip color area sensor', 'sensing_method', 'mmww' ),
+          4 => _x( 'Three-chip color area sensor', 'sensing_method', 'mmww' ),
+          5 => _x( 'Color sequential area sensor', 'sensing_method', 'mmww' ),
+          7 => _x( 'Trilinear sensor', 'sensing_method', 'mmww' ),
+          8 => _x( 'Color sequential linear sensor', 'sensing_method', 'mmww' ),
+        ];
+        $meta['sensingmethod'] = $sensing_method_data[ intval( $exif['SensingMethod'] ) ];
+      }
+
+      if ( array_key_exists( 'ExposureMode', $exif ) ) {
+        /* translators: these are human-readable renderings of the EXIF exposure mode codes */
+        $exposure_mode_data   = [
+          0 => _x( 'Auto', 'exposure_mode', 'mmww' ),
+          1 => _x( 'Manual', 'exposure_mode', 'mmww' ),
+          2 => _x( 'Auto bracket', 'exposure_mode', 'mmww' ),
+        ];
+        $meta['exposuremode'] = $exposure_mode_data[ intval( $exif['ExposureMode'] ) ];
+      }
+
+      if ( array_key_exists( 'ExposureProgram', $exif ) ) {
+        /* translators: these are human-readable renderings of the EXIF exposure program codes */
+        $exposure_program_data    = [
+          1 => _x( 'Manual', 'exposure_program', 'mmww' ),
+          2 => _x( 'Normal Program', 'exposure_program', 'mmww' ),
+          3 => _x( 'Aperture Priority', 'exposure_program', 'mmww' ),
+          4 => _x( 'Shutter Priority', 'exposure_program', 'mmww' ),
+          5 => _x( 'Creative Program', 'exposure_program', 'mmww' ),
+          6 => _x( 'Action Program', 'exposure_program', 'mmww' ),
+          7 => _x( 'Portrait Mode', 'exposure_program', 'mmww' ),
+          8 => _x( 'Landscape Mode', 'exposure_program', 'mmww' ),
+        ];
+        $meta['exposure_program'] = $exposure_program_data[ intval( $exif['ExposureProgram'] ) ];
+      }
+
+      if ( ! empty( $exif['BrightnessValue'] ) ) {
+        $meta['brightness'] = round( wp_exif_frac2dec( $exif['BrightnessValue'] ), 2 );
+      }
+
+      if ( ! empty( $exif['FNumber'] ) ) {
+        $meta['fstop'] = 'f/' . round( wp_exif_frac2dec( $exif['FNumber'] ), 1 );
+      }
+
+      if ( ! empty( $exif['ISOSpeedRatings'] ) ) {
+        $val     = '';
+        $isoitem = $exif['ISOSpeedRatings'];
+        /* This is sometimes an array and sometimes a scalar. If an array we'll flatten it. */
+        if ( is_array( $isoitem ) ) {
+          $isoitems = [];
+          foreach ( $isoitem as $isodetail ) {
+            $isoitems[] = sprintf( '%d', $isodetail );
+          }
+          $val = implode( '/', $isoitems );
+        } else {
+          $val = sprintf( '%d', $isoitem );
+        }
+        $meta['iso'] = $val;
+      }
+
+      if ( ! empty( $exif['ExposureTime'] ) ) {
+        $exposure = wp_exif_frac2dec( $exif['ExposureTime'] );
+        if ( $exposure < 0.51 ) {
+          $meta['shutter'] = '1/' . round( ( 1.0 / $exposure ), 1 );
+        } else if ( $exposure < 2.01 ) {
+          $meta['shutter'] = round( $exposure, 1 );
+        } else {
+          $meta['shutter'] = round( $exposure, 0 );
+        }
+      }
+    }
+
+    return $meta;
+  }
+
+  /**
+   * Convert a GPS exif reference to decimal degrees
+   *
+   * EXIF represents values with rational numbers in strings.
+   * For example the string "9/2" is used to represent 3.5.
+   *
+   * @param string $ref N, E, S, W
+   * @param array $c One to three strings of rational numbers: degrees, degrees/minutes, or degrees/minutes/seconds.
+   *
+   * @return float Degrees.
+   */
+  private function getGPS( $ref, $c ) {
+    // south, west, or negative altitude
+    $sign = ( $ref[0] == 'S' || $ref[0] == 'W' ) ? - 1 : 1;
+    $val  = 0.0;
+    while ( $r = array_pop( $c ) ) {
+      $val /= 60.0;
+      $val += wp_exif_frac2dec( $r );
+    }
+
+    return round( $sign * $val, 6 );
   }
 }
 
