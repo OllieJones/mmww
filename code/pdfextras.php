@@ -2,9 +2,7 @@
 
 /**
  * Filter for PDFs in the media manager, and other support
- * TODO  could be a separate plugin
  * @author Ollie
- *
  */
 class MMWWPDFSupport {
 

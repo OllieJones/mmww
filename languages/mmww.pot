@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: MMWW 1.0.12\n"
+"Project-Id-Version: MMWW 2.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/mmww\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-12-01T14:37:49+00:00\n"
+"POT-Creation-Date: 2025-12-13T21:33:03+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: mmww\n"
@@ -40,406 +40,406 @@ msgctxt "button_name"
 msgid "Audio Player"
 msgstr ""
 
-#: code/exif.php:29
+#: code/exif.php:37
 msgid "EXIF metadata corrupted by Microsoft Windows properties defect"
-msgstr ""
-
-#: code/exif.php:121
-msgctxt "flash"
-msgid "No Flash"
-msgstr ""
-
-#: code/exif.php:122
-msgctxt "flash"
-msgid "Fired"
-msgstr ""
-
-#: code/exif.php:123
-msgctxt "flash"
-msgid "Fired, Return not detected"
-msgstr ""
-
-#: code/exif.php:124
-msgctxt "flash"
-msgid "Fired, Return detected"
-msgstr ""
-
-#: code/exif.php:125
-msgctxt "flash"
-msgid "On, Did not fire"
-msgstr ""
-
-#: code/exif.php:126
-msgctxt "flash"
-msgid "On, Fired"
-msgstr ""
-
-#: code/exif.php:127
-msgctxt "flash"
-msgid "On, Return not detected"
-msgstr ""
-
-#: code/exif.php:128
-msgctxt "flash"
-msgid "On, Return detected"
 msgstr ""
 
 #: code/exif.php:129
 msgctxt "flash"
-msgid "Off, Did not fire"
+msgid "No Flash"
 msgstr ""
 
 #: code/exif.php:130
 msgctxt "flash"
-msgid "Off, Did not fire, Return not detected"
+msgid "Fired"
 msgstr ""
 
 #: code/exif.php:131
 msgctxt "flash"
-msgid "Auto, Did not fire"
+msgid "Fired, Return not detected"
 msgstr ""
 
 #: code/exif.php:132
 msgctxt "flash"
-msgid "Auto, Fired"
+msgid "Fired, Return detected"
 msgstr ""
 
 #: code/exif.php:133
 msgctxt "flash"
-msgid "Auto, Fired, Return not detected"
+msgid "On, Did not fire"
 msgstr ""
 
 #: code/exif.php:134
 msgctxt "flash"
-msgid "Auto, Fired, Return detected"
+msgid "On, Fired"
 msgstr ""
 
 #: code/exif.php:135
 msgctxt "flash"
-msgid "No flash function"
+msgid "On, Return not detected"
 msgstr ""
 
 #: code/exif.php:136
 msgctxt "flash"
-msgid "Off, No flash function"
+msgid "On, Return detected"
 msgstr ""
 
 #: code/exif.php:137
 msgctxt "flash"
-msgid "Fired, Red-eye reduction"
+msgid "Off, Did not fire"
 msgstr ""
 
 #: code/exif.php:138
 msgctxt "flash"
-msgid "Fired, Red-eye reduction, Return not detected"
+msgid "Off, Did not fire, Return not detected"
 msgstr ""
 
 #: code/exif.php:139
 msgctxt "flash"
-msgid "Fired, Red-eye reduction, Return detected"
+msgid "Auto, Did not fire"
 msgstr ""
 
 #: code/exif.php:140
 msgctxt "flash"
-msgid "On, Red-eye reduction"
+msgid "Auto, Fired"
 msgstr ""
 
 #: code/exif.php:141
 msgctxt "flash"
-msgid "On, Red-eye reduction, Return not detected"
+msgid "Auto, Fired, Return not detected"
 msgstr ""
 
 #: code/exif.php:142
 msgctxt "flash"
-msgid "On, Red-eye reduction, Return detected"
+msgid "Auto, Fired, Return detected"
 msgstr ""
 
 #: code/exif.php:143
 msgctxt "flash"
-msgid "Off, Red-eye reduction"
+msgid "No flash function"
 msgstr ""
 
 #: code/exif.php:144
 msgctxt "flash"
-msgid "Auto, Did not fire, Red-eye reduction"
+msgid "Off, No flash function"
 msgstr ""
 
 #: code/exif.php:145
 msgctxt "flash"
-msgid "Auto, Fired, Red-eye reduction"
+msgid "Fired, Red-eye reduction"
 msgstr ""
 
 #: code/exif.php:146
 msgctxt "flash"
-msgid "Auto, Fired, Red-eye reduction, Return not detected"
+msgid "Fired, Red-eye reduction, Return not detected"
 msgstr ""
 
 #: code/exif.php:147
 msgctxt "flash"
-msgid "Auto, Fired, Red-eye reduction, Return detected"
+msgid "Fired, Red-eye reduction, Return detected"
+msgstr ""
+
+#: code/exif.php:148
+msgctxt "flash"
+msgid "On, Red-eye reduction"
+msgstr ""
+
+#: code/exif.php:149
+msgctxt "flash"
+msgid "On, Red-eye reduction, Return not detected"
+msgstr ""
+
+#: code/exif.php:150
+msgctxt "flash"
+msgid "On, Red-eye reduction, Return detected"
+msgstr ""
+
+#: code/exif.php:151
+msgctxt "flash"
+msgid "Off, Red-eye reduction"
+msgstr ""
+
+#: code/exif.php:152
+msgctxt "flash"
+msgid "Auto, Did not fire, Red-eye reduction"
+msgstr ""
+
+#: code/exif.php:153
+msgctxt "flash"
+msgid "Auto, Fired, Red-eye reduction"
+msgstr ""
+
+#: code/exif.php:154
+msgctxt "flash"
+msgid "Auto, Fired, Red-eye reduction, Return not detected"
 msgstr ""
 
 #: code/exif.php:155
+msgctxt "flash"
+msgid "Auto, Fired, Red-eye reduction, Return detected"
+msgstr ""
+
+#: code/exif.php:163
 msgctxt "scene_capture_type"
 msgid "Standard"
 msgstr ""
 
-#: code/exif.php:156
+#: code/exif.php:164
 msgctxt "scene_capture_type"
 msgid "Landscape"
 msgstr ""
 
-#: code/exif.php:157
+#: code/exif.php:165
 msgctxt "scene_capture_type"
 msgid "Portrait"
 msgstr ""
 
-#: code/exif.php:158
+#: code/exif.php:166
 msgctxt "scene_capture_type"
 msgid "Night"
 msgstr ""
 
-#: code/exif.php:166
+#: code/exif.php:174
 msgctxt "sharpness"
 msgid "Normal"
 msgstr ""
 
-#: code/exif.php:167
+#: code/exif.php:175
 msgctxt "sharpness"
 msgid "Soft"
 msgstr ""
 
-#: code/exif.php:168
+#: code/exif.php:176
 msgctxt "sharpness"
 msgid "Hard"
 msgstr ""
 
-#: code/exif.php:176
-msgctxt "light_source"
-msgid "Unknown"
-msgstr ""
-
-#: code/exif.php:177
-msgctxt "light_source"
-msgid "Daylight"
-msgstr ""
-
-#: code/exif.php:178
-msgctxt "light_source"
-msgid "Fluorescent"
-msgstr ""
-
-#: code/exif.php:179
-msgctxt "light_source"
-msgid "Tungsten"
-msgstr ""
-
-#: code/exif.php:180
-msgctxt "light_source"
-msgid "Flash"
-msgstr ""
-
-#: code/exif.php:181
-msgctxt "light_source"
-msgid "Fine weather"
-msgstr ""
-
-#: code/exif.php:182
-msgctxt "light_source"
-msgid "Cloudy weather"
-msgstr ""
-
-#: code/exif.php:183
-msgctxt "light_source"
-msgid "Shade"
-msgstr ""
-
 #: code/exif.php:184
 msgctxt "light_source"
-msgid "Daylight fluorescent"
+msgid "Unknown"
 msgstr ""
 
 #: code/exif.php:185
 msgctxt "light_source"
-msgid "Day white fluorescent"
+msgid "Daylight"
 msgstr ""
 
 #: code/exif.php:186
 msgctxt "light_source"
-msgid "Cool white fluorescent"
+msgid "Fluorescent"
 msgstr ""
 
 #: code/exif.php:187
 msgctxt "light_source"
-msgid "White fluorescent"
+msgid "Tungsten"
 msgstr ""
 
 #: code/exif.php:188
 msgctxt "light_source"
-msgid "Standard light A"
+msgid "Flash"
 msgstr ""
 
 #: code/exif.php:189
 msgctxt "light_source"
-msgid "Standard light B"
+msgid "Fine weather"
 msgstr ""
 
 #: code/exif.php:190
 msgctxt "light_source"
-msgid "Standard light C"
+msgid "Cloudy weather"
 msgstr ""
 
 #: code/exif.php:191
 msgctxt "light_source"
-msgid "D55"
+msgid "Shade"
 msgstr ""
 
 #: code/exif.php:192
 msgctxt "light_source"
-msgid "D65"
+msgid "Daylight fluorescent"
 msgstr ""
 
 #: code/exif.php:193
 msgctxt "light_source"
-msgid "D75"
+msgid "Day white fluorescent"
 msgstr ""
 
 #: code/exif.php:194
 msgctxt "light_source"
-msgid "D50"
+msgid "Cool white fluorescent"
 msgstr ""
 
 #: code/exif.php:195
 msgctxt "light_source"
-msgid "ISO studio tungsten"
+msgid "White fluorescent"
 msgstr ""
 
 #: code/exif.php:196
 msgctxt "light_source"
-msgid "Other light source"
+msgid "Standard light A"
+msgstr ""
+
+#: code/exif.php:197
+msgctxt "light_source"
+msgid "Standard light B"
+msgstr ""
+
+#: code/exif.php:198
+msgctxt "light_source"
+msgid "Standard light C"
+msgstr ""
+
+#: code/exif.php:199
+msgctxt "light_source"
+msgid "D55"
+msgstr ""
+
+#: code/exif.php:200
+msgctxt "light_source"
+msgid "D65"
+msgstr ""
+
+#: code/exif.php:201
+msgctxt "light_source"
+msgid "D75"
+msgstr ""
+
+#: code/exif.php:202
+msgctxt "light_source"
+msgid "D50"
+msgstr ""
+
+#: code/exif.php:203
+msgctxt "light_source"
+msgid "ISO studio tungsten"
 msgstr ""
 
 #: code/exif.php:204
+msgctxt "light_source"
+msgid "Other light source"
+msgstr ""
+
+#: code/exif.php:212
 msgctxt "metering_mode"
 msgid "Unknown"
 msgstr ""
 
-#: code/exif.php:205
+#: code/exif.php:213
 msgctxt "metering_mode"
 msgid "Average"
 msgstr ""
 
-#: code/exif.php:206
+#: code/exif.php:214
 msgctxt "metering_mode"
 msgid "Center weighted average"
 msgstr ""
 
-#: code/exif.php:207
+#: code/exif.php:215
 msgctxt "metering_mode"
 msgid "Spot"
 msgstr ""
 
-#: code/exif.php:208
+#: code/exif.php:216
 msgctxt "metering_mode"
 msgid "Multi Spot"
 msgstr ""
 
-#: code/exif.php:209
+#: code/exif.php:217
 msgctxt "metering_mode"
 msgid "Pattern"
 msgstr ""
 
-#: code/exif.php:210
+#: code/exif.php:218
 msgctxt "metering_mode"
 msgid "Partial"
 msgstr ""
 
-#: code/exif.php:211
+#: code/exif.php:219
 msgctxt "metering_mode"
 msgid "Other"
 msgstr ""
 
-#: code/exif.php:219
+#: code/exif.php:227
 msgctxt "sensing_method"
 msgid "One-chip color area sensor"
 msgstr ""
 
-#: code/exif.php:220
+#: code/exif.php:228
 msgctxt "sensing_method"
 msgid "Two-chip color area sensor"
 msgstr ""
 
-#: code/exif.php:221
+#: code/exif.php:229
 msgctxt "sensing_method"
 msgid "Three-chip color area sensor"
 msgstr ""
 
-#: code/exif.php:222
+#: code/exif.php:230
 msgctxt "sensing_method"
 msgid "Color sequential area sensor"
 msgstr ""
 
-#: code/exif.php:223
+#: code/exif.php:231
 msgctxt "sensing_method"
 msgid "Trilinear sensor"
 msgstr ""
 
-#: code/exif.php:224
+#: code/exif.php:232
 msgctxt "sensing_method"
 msgid "Color sequential linear sensor"
 msgstr ""
 
-#: code/exif.php:232
+#: code/exif.php:240
 msgctxt "exposure_mode"
 msgid "Auto"
 msgstr ""
 
-#: code/exif.php:233
+#: code/exif.php:241
 msgctxt "exposure_mode"
 msgid "Manual"
 msgstr ""
 
-#: code/exif.php:234
+#: code/exif.php:242
 msgctxt "exposure_mode"
 msgid "Auto bracket"
 msgstr ""
 
-#: code/exif.php:242
+#: code/exif.php:250
 msgctxt "exposure_program"
 msgid "Manual"
 msgstr ""
 
-#: code/exif.php:243
+#: code/exif.php:251
 msgctxt "exposure_program"
 msgid "Normal Program"
 msgstr ""
 
-#: code/exif.php:244
+#: code/exif.php:252
 msgctxt "exposure_program"
 msgid "Aperture Priority"
 msgstr ""
 
-#: code/exif.php:245
+#: code/exif.php:253
 msgctxt "exposure_program"
 msgid "Shutter Priority"
 msgstr ""
 
-#: code/exif.php:246
+#: code/exif.php:254
 msgctxt "exposure_program"
 msgid "Creative Program"
 msgstr ""
 
-#: code/exif.php:247
+#: code/exif.php:255
 msgctxt "exposure_program"
 msgid "Action Program"
 msgstr ""
 
-#: code/exif.php:248
+#: code/exif.php:256
 msgctxt "exposure_program"
 msgid "Portrait Mode"
 msgstr ""
 
-#: code/exif.php:249
+#: code/exif.php:257
 msgctxt "exposure_program"
 msgid "Landscape Mode"
 msgstr ""
@@ -567,20 +567,20 @@ msgstr ""
 msgid "Save Changes"
 msgstr ""
 
-#: code/mmww_media_upload.php:346
+#: code/mmww_media_upload.php:431
 msgid "Unrecognized media type in file "
 msgstr ""
 
-#: code/pdfextras.php:17
+#: code/pdfextras.php:15
 msgid "PDFs"
 msgstr ""
 
-#: code/pdfextras.php:18
+#: code/pdfextras.php:16
 msgid "Manage PDFs"
 msgstr ""
 
 #. translators: 1. number of uploaded media files (pdfs).
-#: code/pdfextras.php:20
+#: code/pdfextras.php:18
 msgid "PDF <span class=\"count\">(%s)</span>"
 msgid_plural "PDFs <span class=\"count\">(%s)</span>"
 msgstr[0] ""
@@ -590,7 +590,7 @@ msgstr[1] ""
 msgid "Media attachment metadata reloaded from file. Update to save it."
 msgstr ""
 
-#: code/reread.php:200
-#: code/reread.php:293
+#: code/reread.php:202
+#: code/reread.php:295
 msgid "Reload Metadata"
 msgstr ""

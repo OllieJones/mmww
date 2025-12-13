@@ -2,12 +2,20 @@
 
 class MMWWEXIFReader {
   private $exif;
+  private $wpmeta;
 
-  function __construct( $file ) {
-    unset ( $this->exif );
-    // fetch additional info from exif if available
-    if ( is_callable( 'exif_read_data' ) ) {
-      $this->exif = @exif_read_data( $file, 'IFD0,FILE,EXIF,COMMENT' , false, false );
+  function __construct( $init ) {
+    if ( is_array ($init)){
+      $this->exif = $init;
+    } else {
+      $this->wpmeta = wp_read_image_metadata( $init );
+      // fetch additional info from exif if available
+      if ( function_exists( 'exif_read_data' ) ) {
+        $this->exif = @exif_read_data( $init, 'IFD0,FILE,EXIF,COMMENT', false, false );
+      }
+      if ( ! empty( $this->exif ) ) {
+        $this->exif = array_merge( $this->exif, $this->wpmeta );
+      }
     }
   }
 
@@ -53,7 +61,7 @@ class MMWWEXIFReader {
       }
 
       if ( ! empty( $exif['Copyright'] ) && strlen( $exif['Copyright'] ) > 0 ) {
-        $meta['copyright'] = mb_convert_encoding(  trim( $exif['Copyright'] ), 'ISO-8859-1', 'UTF-8' );
+        $meta['copyright'] = mb_convert_encoding( trim( $exif['Copyright'] ), 'ISO-8859-1', 'UTF-8' );
       }
 
       if ( ( ! empty( $exif['GPSLongitudeRef'] ) ) &&
@@ -89,7 +97,7 @@ class MMWWEXIFReader {
       }
 
       /* T for true or M for magnetic direction */
-      if ( ! empty( $meta['direction'] ) && empty( $exif['GPSImgDirectionRef'] ) ) {
+      if ( ! empty( $meta['direction'] ) && ! empty( $exif['GPSImgDirectionRef'] ) ) {
         $meta['direction'] .= $exif['GPSImgDirectionRef'];
       }
 

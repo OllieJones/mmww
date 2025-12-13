@@ -1,6 +1,6 @@
 === MMWW ===
 Contributors: olliejones
-Tags: mp3, images, metadata, exif, id3, iptc
+Tags: audio, images, metadata, exif, iptc
 Requires at least: 4.6
 Tested up to: 6.9
 Requires PHP: 5.6
@@ -90,8 +90,8 @@ JPEG photo files have lots of possible metadata. Not every photograph has all th
      {rating}          0 - 5, set by various image browsers
      {workflowlabel}   A text string like "Discard" or "Keep," set by various image browsers
      {camera}          Camera model
-     {shutter}         Shutter speed, such as 1/60
-     {shutter_speed}   Raw shutter speed, such as 60
+     {shutter}         Shutter speed, such as 1/200
+     {shutter_speed}   Shutter time in sec, such as 0.05
      {fstop}           Aperture, like f/5.6
      {aperture}        Raw aperture, like 5.60
      {flash}           Flash setting, such as "No Flash" or "Fired, Red-eye reduction"
@@ -256,9 +256,8 @@ It's a problem with WordPress, not with MMWW: WordPress doesn't handle TIFFs cor
 
 = 2.0.0 =
 
-Compatibility with WordPress 6.9 and php 8.4.
-
-Better .png metadata handling  and support for aac audio.
+* A complete renovation of the code for compatibility with WordPress 6.9 and php 8.4.
+* Better .png metadata handling  and support for aac audio.
 
 = 1.10.11
 
@@ -282,8 +281,9 @@ WordPress 4.1.1 compatibility.
 
 == Upgrade Notice ==
 
-This release adds compatibility (and deprecation removal) with WordPress 6.9 and php 8.4. It also adds better .png metadata handling  and support for aac audio.
+This release is a complete renovation of the code to use the capabilities of WordPress. It adds support for php8.4.
 
+It adds support for aac audio files and HEIC / AVIF / WEBP files.
 == To Do ==
 
 * Figure out how to put keywords into a taxonomy if that's what the user wants.

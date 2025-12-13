@@ -47,13 +47,17 @@ class MMWWIPTCReader {
   ];
 
 
-  function __construct( $file ) {
-    $this->iptc = false;
-    // fetch additional info from iptc if available
-    if ( is_callable( 'iptcparse' ) ) {
-      getimagesize( $file, $info );
-      if ( array_key_exists( 'APP13', $info ) ) {
-        $this->iptc = iptcparse( $info['APP13'] );
+  function __construct( $init ) {
+    if ( is_array( $init ) ) {
+      $this->iptc = $init;
+    } else {
+      $this->iptc = false;
+      // fetch additional info from iptc if available
+      if ( is_callable( 'iptcparse' ) ) {
+        getimagesize( $init, $info );
+        if ( array_key_exists( 'APP13', $info ) ) {
+          $this->iptc = iptcparse( $info['APP13'] );
+        }
       }
     }
   }
@@ -134,7 +138,10 @@ class MMWWIPTCReader {
     return $meta;
   }
 
-  private function make_utf8( $string ) {
+  private
+  function make_utf8(
+    $string
+  ) {
     if ( $this->is_utf8( $string ) ) {
       return $string;
     } else {
@@ -150,7 +157,9 @@ class MMWWIPTCReader {
    * @since        1.14
    * @subpackage
    */
-  private function is_utf8( $string ) {
+  private function is_utf8(
+    $string
+  ) {
 
     // From http://w3.org/International/questions/qa-forms-utf-8.html
     return preg_match( '%^(?:

@@ -4,7 +4,7 @@ class MMWWRereader {
 
   /**
    * list of meta fields corresponding to wp_posts columns.
-   * @var associative array
+   * @va array
    */
   private $fields = [
     'title'          => 'post_title',
@@ -100,7 +100,7 @@ class MMWWRereader {
       }
     }
 
-    /* make any updates needed to the posts table. */
+    /* make any updates needed to the posts table. */  //HACK HACK use ordinary post update, not this SQL jazz.
     if ( ! empty ( $updates ) ) {
       global $wpdb;
       $where = [ 'ID' => $id ];
@@ -189,7 +189,7 @@ class MMWWRereader {
    *   $action['reread'] = http://host/wp-admin/post.php?post=999&action=reread&_wpnonce=abcdef9879
    *
    * @param array $actions
-   * @param Post $post
+   * @param WP_Post $post
    * @param boolean $detached
    *
    * @returns array of actions
