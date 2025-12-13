@@ -36,6 +36,10 @@ class MMWWMedia {
    * @return array of metadata
    */
   function add_tidy_metadata( $meta ) {
+
+    foreach ( array( 'mmww_type', 'filename' ) as $item ) {
+      $this->promote_item( $meta, $item );
+    }
     /* get a creation time string from the timestamp */
     if ( ! empty ( $meta['created_timestamp'] ) ) {
       /* do the timezone stuff right; png creation time is in local time */
@@ -62,6 +66,15 @@ class MMWWMedia {
     if ( ! is_array( $meta ) ) {
       return $meta;
     }
+    if ( isset( $meta['image_meta'] ) && is_array( $meta['image_meta'] ) ) {
+      $this->cleanmeta( $meta['image_meta'] );
+    }
+    $this->cleanmeta( $meta );
+
+    return $meta;
+  }
+
+  private function cleanmeta( &$meta ) {
     /* eliminate redundant items from the metadata  (Jetpack uses 'aperture' and 'shutter_speed')*/
     $tozap = [ 'warning' ];
     foreach ( $tozap as $zap ) {
@@ -80,8 +93,6 @@ class MMWWMedia {
         }
       }
     }
-
-    return $meta;
   }
 
   /**
@@ -97,9 +108,18 @@ class MMWWMedia {
     if ( ! is_array( $meta ) || ! isset( $meta['mmww_type'] ) ) {
       return $newmeta;
     }
+
+    /* Flatten the metadata */
+    $flat = $meta;
+    if ( isset( $meta['image_meta'] ) && is_array( $meta['image_meta'] ) ) {
+      $image = $meta['image_meta'];
+      unset( $flat['image_meta'] );
+      $flat = array_merge( $image, $flat );
+    }
+
     foreach ( $codes as $code ) {
       $codetype = $meta['mmww_type'] . '_' . $code;
-      $gen      = $this->make_string( $meta, $codetype );
+      $gen      = $this->make_string( $flat, $codetype );
       if ( ! empty( $gen ) ) {
         $newmeta[ $code ] = $gen;
       }
@@ -295,6 +315,8 @@ class MMWWMedia {
     $meta   = array_merge( $new, $meta );
 
     $meta['mmww_type'] = 'image';
+    $meta['filename']  = pathinfo( $file, PATHINFO_FILENAME );
+
     return wp_kses_post_deep( $meta );
   }
 
@@ -557,6 +579,16 @@ class MMWWMedia {
     }
 
     return round( $sign * $val, 6 );
+  }
+
+  private function promote_item( &$meta, $item, $nest = 'image_meta' ) {
+    /* If we have image metadata move  the item. */
+    if ( isset( $meta[ $nest ][ $item ] ) && is_string( $meta[ $nest ][ $item ] ) ) {
+      $meta[ $item ] = $meta[ $nest ][ $item ];
+      unset( $meta[ $nest ][ $item ] );
+    }
+
+
   }
 }
 

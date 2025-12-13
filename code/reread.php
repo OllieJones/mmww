@@ -175,11 +175,9 @@ class MMWWRereader {
 
   function get_new( $post ) {
 
-    $meta      = wp_read_image_metadata( get_attached_file( $post->ID ) );
+    $meta      = wp_generate_attachment_metadata( $post->ID, get_attached_file( $post->ID ) );
     $cleanmeta = apply_filters( 'mmww_filter_metadata', $meta );
     $newmeta   = apply_filters( 'mmww_format_metadata', $cleanmeta );
-
-    $newmeta['image_meta'] = $meta;
 
     return $newmeta;
   }
