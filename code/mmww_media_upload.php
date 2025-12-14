@@ -23,8 +23,6 @@ class MMWWMedia {
     add_filter( 'wp_read_image_metadata', [ $this, 'wp_read_image_metadata' ], 10, 5 );
     add_filter( 'wp_read_audio_metadata', [ $this, 'wp_read_audio_metadata' ], 10, 4 );
     add_filter( 'wp_read_video_metadata', [ $this, 'wp_read_video_metadata' ], 10, 4 );
-    /* image metadata readers ... these only fire after handling image metadata. */
-    //TODO put this in refetch_metadata add_filter( 'wp_read_image_metadata', [ $this, 'read_media_metadata' ], 11, 3 );
 
   }
 
@@ -161,8 +159,16 @@ class MMWWMedia {
    */
   function refetch_metadata( $metadata, $id, $context ) {
     $this->post_id = $id;
+    $mime_type     = get_post_mime_type( $id );
     $file          = get_attached_file( $id );
-    if ( is_array( $metadata['image_meta'] ) ) {
+    if ( 'application/pdf' === $mime_type ) {
+      require_once 'xmp.php';
+      $metadata['mmww_type'] = 'application';
+      $reader                = new MMWWXMPReader( $file );
+      $pdfmeta               = $reader->get_metadata();
+      $metadata              = array_merge( $metadata, $pdfmeta );
+    }
+    if ( isset( $metadata['image_meta'] ) && is_array( $metadata['image_meta'] ) ) {
       $new_image_meta         = wp_read_image_metadata( $file );
       $new_image_meta         = is_array( $new_image_meta ) ? $new_image_meta : array();
       $metadata['image_meta'] = array_merge( $metadata['image_meta'], $new_image_meta );
@@ -396,101 +402,6 @@ class MMWWMedia {
     return $meta;
   }
 
-
-  /**
-   * filter to extend the stuff in wp_admin/includes/image.php
-   *        and store the metadata in the right place.
-   *        This function handles xmp, iptc, exif, png, and id3v2
-   *        and so copes pretty well with pdf, mp3, jpg, png etc.
-   *
-   * This doesn't get hooked unless the file is a known type.
-   *
-   * @param array $meta associative array containing pre-loaded metadata
-   * @param string $file file name
-   * @param string $sourceImageType encoding of a few MIME types
-   *
-   * @return bool|array False on failure. Image metadata array on success.
-   * @noinspection PhpUnusedParameterInspection
-   */
-  function read_media_metadata( $meta, $file, $sourceImageType ) {   //HACK HACK retire this?
-
-    if ( ! file_exists( $file ) ) {
-      return $meta;
-    }
-
-    /* figure out the filetype */
-    $ft       = wp_check_filetype( $file );
-    $filetype = $ft['type'];
-    $filetype = $this->getfiletype( $filetype );
-
-    /* figure out the file's leafname */
-
-    /* create a media-specific ordered list of metadata readers
-     * avoid doing the require operations unless
-     * the code for the particular data type
-     * is required -- this is a server-side operation.
-     */
-    $readers = [];
-    switch ( $filetype ) {
-
-      case 'image':
-        require_once 'exif.php';
-        require_once 'png.php';
-        require_once 'iptc.php';
-        $readers[] = new MMWWEXIFReader( $file );
-        $readers[] = new MMWWPNGReader( $file );
-        $readers[] = new MMWWIPTCReader( $file );
-        break;
-
-      case 'application':
-        if ( 'application/pdf' !== $ft['type'] ) {
-          return $meta;
-        }
-        /* this is for pdf. Processing below for that */
-        break;
-
-      default:
-        $meta_accum['warning'] = __( 'Unrecognized media type in file ', 'mmww' ) . "$file ($filetype)";
-    }
-
-    require_once 'xmp.php';
-    $readers[] = new MMWWXMPReader( $file );
-
-    /* merge up the metadata  -- later merges overwrite earlier ones*/
-    $meta_accum              = [];
-    $tag_accum               = [];
-    $meta_accum['mmww_type'] = $filetype;
-    $meta_accum['filename']  = pathinfo( $file, PATHINFO_FILENAME );
-    foreach ( $readers as $reader ) {
-      if ( method_exists( $reader, 'get_audio_metadata' ) ) {
-        $newmeta    = $reader->get_audio_metadata();
-        $meta_accum = array_merge( $meta_accum, $newmeta );
-      }
-      $newmeta    = $reader->get_metadata();
-      $meta_accum = array_merge( $meta_accum, $newmeta );
-
-      if ( method_exists( $reader, 'get_tags' ) ) {
-        $newtag    = $reader->get_tags();
-        $tag_accum = array_merge( $tag_accum, $newtag );
-      }
-    }
-
-    if ( 0 === $this->post_id ) {
-      $this->post_id = $GLOBALS['post_id'];
-      $this->post    = get_post( $this->post_id );
-    }
-
-    $this->get_wp_tags( $meta_accum );
-
-    /** @noinspection PhpUnnecessaryLocalVariableInspection */
-    $meta = array_merge( $meta, $meta_accum );
-
-    /* handle tags */
-
-    //TODO  put in the tag array to the resulting meta array.
-
-    return $meta;
-  }
 
   /**
    * turn audio/mpeg into audio, image/tiff into image, etc

@@ -34,7 +34,6 @@ class MMWWXMPReader {
     [ 'iptc:creator:phone', '//@Iptc4xmpCore:CiAdrTelWork' ],
     [ 'iptc:creator:email', '//@Iptc4xmpCore:CiAdrEmailWork' ],
     [ 'iptc:creator:website', '//@Iptc4xmpCore:CiAdrUrlWork' ],
-
     [ 'iptc:iptcsubjectcode', '//Iptc4xmpCore:SubjectCode/rdf:Bag/rdf:li' ],
     [ 'iptc:genre', '//@Iptc4xmpCore:IntellectualGenre' ],
     [ 'iptc:scenecode', '//Iptc4xmpCore:Scene/rdf:Bag/rdf:li' ],
@@ -169,28 +168,29 @@ class MMWWXMPReader {
   private function get_list( $xmps, $list, $separator = ';' ) {
     $result = [];
     foreach ( $xmps as $xmp ) {
-	    if ( is_object( $xmp ) ) {
-		    foreach ( $list as $pair ) {
-			    $tag    = $pair[0];
-			    $xpath  = $pair[1];
-			    $errors = error_reporting();
-			    error_reporting( $errors & ! E_WARNING );
-			    $it = $xmp->xpath( $xpath );
-			    error_reporting( $errors );
-			    if ( ! ( $it === false ) ) {
-				    $gather = [];
-				    foreach ( $it as $s ) {
-					    $gather[] = $s;
-				    }
-				    if ( ! empty( $gather ) ) {
-					    $out = implode( $separator, $gather );
-					    if ( strlen( $out ) > 0 ) {
-						    $result[ $tag ] = $out;
-					    }
-				    }
-			    }
-		    }
-	    }
+      if ( is_object( $xmp ) ) {
+        foreach ( $xmp->getDocNamespaces( true, true ) as $prefix => $namespace ) {
+          $xmp->registerXPathNamespace( $prefix, $namespace );
+        }
+        foreach ( $list as list( $tag, $xpath) ) {
+          $errors = error_reporting();
+          error_reporting( $errors & ! E_WARNING );
+          $it = @$xmp->xpath( $xpath );
+          error_reporting( $errors );
+          if ( ! ( $it === false ) ) {
+            $gather = [];
+            foreach ( $it as $s ) {
+              $gather[] = $s;
+            }
+            if ( ! empty( $gather ) ) {
+              $out = implode( $separator, $gather );
+              if ( strlen( $out ) > 0 ) {
+                $result[ $tag ] = $out;
+              }
+            }
+          }
+        }
+      }
     }
     if ( array_key_exists( 'iso8601timestamp', $result ) ) {
       /* cope with iso timestamp */
