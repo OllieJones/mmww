@@ -3,6 +3,8 @@
 class MMWWMedia {
 
   private $post_id = 0;
+  private $current_post_id_apply_template;
+  private $current_post_id_update_metadata;
   private $post = null;
 
   function __construct() {
@@ -13,17 +15,40 @@ class MMWWMedia {
     add_filter( 'mmww_filter_metadata', [ $this, 'remove_meaningless_metadata' ], 11, 1 );
     /* metadata display filters; internal to mmww */
     add_filter( 'mmww_format_metadata', [ $this, 'format_metadata' ], 12, 1 );
-    /* attachment metadata specific */
+    /* Attachment metadata specific.
+     * There's something confusing going on here. Two things actually:
+     * For images, these next filters fire for the main image AND for each subsize.
+     * And, for images, the image metadata lives in an element of the $meta array, $meta['image_meta'].
+     * Neither of these things is true for audio, pdf, or other media files, only images. */
     add_filter( 'wp_generate_attachment_metadata', [ $this, 'refetch_metadata' ], 10, 3 );
-    add_filter( 'wp_update_attachment_metadata', [ $this, 'update_metadata' ], 10, 2 );
     add_filter( 'wp_update_attachment_metadata', [ $this, 'apply_template_metadata' ], 60, 2 );
+    add_filter( 'wp_update_attachment_metadata', [ $this, 'update_metadata' ], 61, 2 );
 
+    /* Back to filters that fire once per media file, not once for each subsize. */
     add_filter( 'update_attached_file', [ $this, 'update_attached_file' ], 10, 2 );
     /* Media object type filers */
     add_filter( 'wp_read_image_metadata', [ $this, 'wp_read_image_metadata' ], 10, 5 );
     add_filter( 'wp_read_audio_metadata', [ $this, 'wp_read_audio_metadata' ], 10, 4 );
     add_filter( 'wp_read_video_metadata', [ $this, 'wp_read_video_metadata' ], 10, 4 );
 
+  }
+
+  /**
+   * Returns a UNIX timestamp offset by a particular time zone.
+   *
+   * @param int $ts UNIX timestamp (UTC).
+   * @param boolean $to_local Offset  the timestamp from UTC to local if true, from local to UTC if false. Default is to local.
+   * @param string $zone Timezone's zoneinfo name. Default is the 'timezone_string' option.
+   *
+   * @return int Returns a timestamp in "local time", offset by the time zone.
+   * @throws DateInvalidTimeZoneException
+   * @throws Exception
+   */
+  public static function offset_timestamp_by_zone( $ts, $to_local = true, $zone = null ) {
+    $tz = new DateTimeZone ( $zone ?: get_option( 'timezone_string' ) );
+    $dt = ( new DateTimeImmutable( "now", $tz ) )->setTimestamp( $ts );
+
+      return $to_local ? $ts + $dt->getOffset() : $ts - $dt->getOffset();
   }
 
   /**
@@ -35,18 +60,21 @@ class MMWWMedia {
    */
   function add_tidy_metadata( $meta ) {
 
-    foreach ( array( 'mmww_type', 'filename' ) as $item ) {
+    foreach ( array( 'mmww_type', 'filename', 'created_timestamp' ) as $item ) {
       $this->promote_item( $meta, $item );
     }
     /* get a creation time string from the timestamp */
     if ( ! empty ( $meta['created_timestamp'] ) ) {
       /* do the timezone stuff right; png creation time is in local time */
-      $previous = date_default_timezone_get();
-      @date_default_timezone_set( get_option( 'timezone_string' ) );
-      $meta['created_time'] =
-        date_i18n( get_option( 'date_format' ), $meta['created_timestamp'] ) . ' ' .
-        date_i18n( get_option( 'time_format' ), $meta['created_timestamp'] );
-      @date_default_timezone_set( $previous );
+      try {
+        $timestamp = self::offset_timestamp_by_zone( $meta['created_timestamp'] );
+
+        $meta['created_time'] =
+          date_i18n( get_option( 'date_format' ), $timestamp ) . ' ' .
+          date_i18n( get_option( 'time_format' ), $timestamp );
+      } catch ( Exception $e ) {
+        unset( $meta['created_time'] );
+      }
     }
 
     return $meta;
@@ -106,14 +134,7 @@ class MMWWMedia {
     if ( ! is_array( $meta ) || ! isset( $meta['mmww_type'] ) ) {
       return $newmeta;
     }
-
-    /* Flatten the metadata */
-    $flat = $meta;
-    if ( isset( $meta['image_meta'] ) && is_array( $meta['image_meta'] ) ) {
-      $image = $meta['image_meta'];
-      unset( $flat['image_meta'] );
-      $flat = array_merge( $image, $flat );
-    }
+    $flat = $this->flatten( $meta );
 
     foreach ( $codes as $code ) {
       $codetype = $meta['mmww_type'] . '_' . $code;
@@ -207,56 +228,54 @@ class MMWWMedia {
   /**
    * Function to handle extra stuff in attachment metadata update
    *
-   * @param array $data attachment data array. Can be an empty array
+   * @param array $meta attachment data array. Can be an empty array
    * @param int $id attachment id
    *
    * @return array data, modified as needed
    */
-  function update_metadata( $data, $id ) {
+  function update_metadata( $meta, $id ) {
 
+    /* Avoid repeating all this for every image subsize. */
     $this->post_id = $id;
-    if ( ! empty ( $data ) && array_key_exists( 'image_meta', $data ) ) {
-      $meta    = $data['image_meta'];
+    if ( $this->current_post_id_update_metadata !== $id ) {
+      $this->current_post_id_update_metadata = $id;
+
+      $flat    = $this->flatten( $meta );
       $updates = [ 'ID' => $id ];
 
-      /* handle the caption for photos, which goes into wp_posts.post_excerpt. */
-      if ( ! empty( $meta['displaycaption'] ) ) {
-        $updates['post_excerpt'] = $meta['displaycaption'];
+      if ( ! empty( $flat['displaycaption'] ) ) {
+        $updates['post_excerpt'] = $flat['displaycaption'];
       }
 
+      if ( ! empty( $flat['caption'] ) ) {
+        $updates['post_content'] = $flat['caption'];
+      }
+      if ( ! empty( $flat['title'] ) ) {
+        $updates['post_title'] = $flat['title'];
+      }
       /* update the attachment post_date and post_date_gmt if that's what the admin wants and the metadata has it */
       $options = get_option( 'mmww_options' );
       $choice  = ( empty( $options['use_creation_date'] ) ) ? 'no' : $options['use_creation_date'];
-      if ( $choice == 'yes' && ! empty( $meta['created_timestamp'] ) ) {
-        /* a note on timezones: WP mostly keeps the PHP default timezone set to
-         * UTC and computes an offset between UTC and local time when it's needed.
-         * That works fine for time = now.  But for incoming timestamps
-         * (embedded in media), it's necessary to set the PHP timezone to the
-         * user's timezone.  This is because the current timezone offset may not be
-         * the same as the offset at the time in the incoming timestamp.
-         * That is, for example, the incoming timestamp may have been when daylight
-         * savings time was in force, but that may not be true at time=now.
-         * Hence this monkey business with saving and restoring the
-         * default timezone.   //TODO this is probably overwrought.
-         */
-        $previous = date_default_timezone_get();
-        @date_default_timezone_set( get_option( 'timezone_string' ) );
-        $ltime                    = date( 'Y-m-d H:i:s', $meta['created_timestamp'] );
-        $updates['post_date']     = $ltime;
-        $ztime                    = gmdate( 'Y-m-d H:i:s', $meta['created_timestamp'] );
-        $updates['post_date_gmt'] = $ztime;
-        @date_default_timezone_set( $previous );
-      }
+      if ( $choice == 'yes' && ! empty( $flat['created_timestamp'] ) ) {
+        try {
+          $local = self::offset_timestamp_by_zone( $flat['created_timestamp'] );
 
-      wp_update_post( $updates );
+          $updates['post_date']     = gmdate( 'Y-m-d H:i:s', $local );
+          $updates['post_date_gmt'] = gmdate( 'Y-m-d H:i:s', $flat['created_timestamp'] );
+        } catch ( Exception $e ) {
+          unset ( $updates['post_date'] );
+          unset ( $updates['post_date_gmt'] );
+        }
+      }
+      wp_update_post( wp_kses_post_deep( $updates ) );
 
       /* handle the image alt text (screenreader etc.) which goes into a postmeta row */
-      if ( ! empty( $meta['alt'] ) ) {
-        update_post_meta( $id, '_wp_attachment_image_alt', $meta['alt'] );
+      if ( ! empty( $flat['alt'] ) ) {
+        update_post_meta( $id, '_wp_attachment_image_alt', $flat['alt'] );
       }
     }
 
-    return $data;
+    return $meta;
   }
 
   /**
@@ -293,7 +312,7 @@ class MMWWMedia {
         require_once 'png.php';
         $reader = new MMWWPNGReader( $file );
         $new    = $reader->get_metadata();
-        $meta   = array_merge( $new, $meta );
+        $meta   = array_merge( $meta, $new );
 
         break;
       default:
@@ -301,14 +320,14 @@ class MMWWMedia {
           require_once 'exif.php';
           $reader = new MMWWEXIFReader( $exif );
           $new    = $reader->get_metadata();
-          $meta   = array_merge( $new, $meta );
+          $meta   = array_merge( $meta , $new);
         }
         if ( is_array( $iptc ) && count( $iptc ) > 0 ) {
           require_once 'iptc.php';
           $reader = new MMWWIPTCReader( $iptc );
 
           $new  = $reader->get_metadata();
-          $meta = array_merge( $new, $meta );
+          $meta = array_merge( $meta, $new );
         }
 
         break;
@@ -318,7 +337,7 @@ class MMWWMedia {
     require_once 'xmp.php';
     $reader = new MMWWXMPReader( $file );
     $new    = $reader->get_metadata();
-    $meta   = array_merge( $new, $meta );
+    $meta   = array_merge( $meta, $new );
 
     $meta['mmww_type'] = 'image';
     $meta['filename']  = pathinfo( $file, PATHINFO_FILENAME );
@@ -402,6 +421,18 @@ class MMWWMedia {
     return $meta;
   }
 
+  private function flatten( array $meta ) {
+    /* Flatten the metadata */
+    $flat = $meta;
+    if ( isset( $flat['image_meta'] ) && is_array( $flat['image_meta'] ) ) {
+      $image = $flat['image_meta'];
+      unset( $flat['image_meta'] );
+      $flat = array_merge( $image, $flat );
+    }
+
+    return $flat;
+  }
+
 
   /**
    * turn audio/mpeg into audio, image/tiff into image, etc
@@ -420,28 +451,32 @@ class MMWWMedia {
    * filter to use the metadata to construct title and caption
    *        using appropriate templates
    *
+   * Notice that, for images, this gets called for every generated image subsize.
+   *
    * @param array $meta associative array containing pre-loaded metadata
    * @param int $id Post ID
    *
    * @return bool|array False on failure. Image metadata array on success.
-   * @noinspection PhpUnusedParameterInspection
    */
   public function apply_template_metadata( $meta, $id ) {
-    if ( empty ( $meta ) || empty ( $meta['mmww_type'] ) ) {
-      /* if there's no mmww metadata detected, don't do anything more */
-      return $meta;
+    if ( $this->current_post_id_apply_template !== $id ) {
+
+      $this->current_post_id_apply_template = $id;
+      foreach ( array( 'mmww_type', 'filename' ) as $item ) {
+        $this->promote_item( $meta, $item );
+      }
+
+      if ( empty ( $meta ) || empty ( $meta['mmww_type'] ) ) {
+        /* if there's no mmww metadata detected, don't do anything more */
+        return $meta;
+      }
+
+      $cleanmeta = apply_filters( 'mmww_filter_metadata', $meta );
+
+      $newmeta = apply_filters( 'mmww_format_metadata', $cleanmeta );
+
+      $meta = array_merge( $cleanmeta, $newmeta );
     }
-
-    $cleanmeta = apply_filters( 'mmww_filter_metadata', $meta );
-
-    /* $meta[caption] goes into wp_posts.post_content. This is shown as "description" in the UI.
-     * $meta[title] goes into wp_posts.post_title. This is shown as "title"
-     * we don't have a $meta item to go into wp_posts.post_excerpt. This is shown as "caption" in the UI.
-     */
-
-    $newmeta = apply_filters( 'mmww_format_metadata', $cleanmeta );
-
-    $meta = array_merge( $cleanmeta, $newmeta );
 
     return $meta;
   }
@@ -469,36 +504,15 @@ class MMWWMedia {
     return;  //stub
   }
 
-  /**
-   * Convert a GPS exif reference to decimal degrees
-   *
-   * EXIF represents values with rational numbers in strings.
-   * For example the string "9/2" is used to represent 3.5.
-   *
-   * @param string $ref N, E, S, W
-   * @param array $c One to three strings of rational numbers: degrees, degrees/minutes, or degrees/minutes/seconds.
-   *
-   * @return float Degrees.
-   */
-  private function getGPS( $ref, $c ) {
-    // south, west, or negative altitude
-    $sign = ( $ref[0] == 'S' || $ref[0] == 'W' ) ? - 1 : 1;
-    $val  = 0.0;
-    while ( $r = array_pop( $c ) ) {
-      $val /= 60.0;
-      $val += wp_exif_frac2dec( $r );
-    }
-
-    return round( $sign * $val, 6 );
-  }
 
   private function promote_item( &$meta, $item, $nest = 'image_meta' ) {
-    /* If we have image metadata move  the item. */
-    if ( isset( $meta[ $nest ][ $item ] ) && is_string( $meta[ $nest ][ $item ] ) ) {
-      $meta[ $item ] = $meta[ $nest ][ $item ];
-      unset( $meta[ $nest ][ $item ] );
+    if ( ! isset ( $meta[ $item ] ) ) {
+      /* If we have image metadata move  the item. */
+      if ( isset( $meta[ $nest ][ $item ] ) && is_string( $meta[ $nest ][ $item ] ) ) {
+        $meta[ $item ] = $meta[ $nest ][ $item ];
+        unset( $meta[ $nest ][ $item ] );
+      }
     }
-
 
   }
 }

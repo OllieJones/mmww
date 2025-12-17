@@ -5,13 +5,13 @@ class MMWWEXIFReader {
   private $wpmeta;
 
   function __construct( $init ) {
-    if ( is_array ($init)){
+    if ( is_array( $init ) ) {
       $this->exif = $init;
     } else {
       $this->wpmeta = wp_read_image_metadata( $init );
       // fetch additional info from exif if available
       if ( function_exists( 'exif_read_data' ) ) {
-        $this->exif = @exif_read_data( $init, 'IFD0,FILE,EXIF,COMMENT', false, false );
+        $this->exif = @exif_read_data( $init, 'IFD0,FILE,EXIF,COMMENT' );
       }
       if ( ! empty( $this->exif ) ) {
         $this->exif = array_merge( $this->exif, $this->wpmeta );
@@ -43,11 +43,10 @@ class MMWWEXIFReader {
           $meta['title'] = mb_convert_encoding( $tempString, 'ISO-8859-1', 'UTF-8' );
           if ( ! empty( $exif['COMPUTED']['UserComment'] ) && trim( $exif['COMPUTED']['UserComment'] ) != $meta['title'] ) {
             $tempString          = trim( $exif['COMPUTED']['UserComment'] );
-            $meta['description'] = mb_convert_encoding( $tempString, 'ISO-8859-1', 'UTF-8' );
           } else {
             $tempString          = trim( $exif['ImageDescription'] );
-            $meta['description'] = mb_convert_encoding( $tempString, 'ISO-8859-1', 'UTF-8' );
           }
+          $meta['description'] = mb_convert_encoding( $tempString, 'ISO-8859-1', 'UTF-8' );
         } elseif ( ! empty( $exif['Comments'] ) ) {
           $tempString          = trim( $exif['Comments'] );
           $meta['description'] = mb_convert_encoding( $tempString, 'ISO-8859-1', 'UTF-8' );
@@ -106,11 +105,9 @@ class MMWWEXIFReader {
       }
 
       if ( ! empty( $exif['DateTimeDigitized'] ) ) {
-        /* do the timezone stuff right; camera metadata is in local time */
-        $previous = date_default_timezone_get();
-        @date_default_timezone_set( get_option( 'timezone_string' ) );
-        $meta['created_timestamp'] = wp_exif_date2ts( $exif['DateTimeDigitized'] );
-        @date_default_timezone_set( $previous );
+        /* Time and timezone offset (offset not handled by WordPress as of 6.9.
+         * see https://exiftool.org/TagNames/EXIF.html */
+        $meta['created_timestamp'] = $this->getTime( $exif['DateTimeDigitized'], isset($exif['UndefinedTag:0x9011']) ? $exif['UndefinedTag:0x9011'] : null );
       }
       if ( empty( $meta['created_timestamp'] ) && ! empty( $exif['FileDateTime'] ) ) {
         $meta['created_timestamp'] = $exif['FileDateTime'];
@@ -268,7 +265,6 @@ class MMWWEXIFReader {
       }
 
       if ( ! empty( $exif['ISOSpeedRatings'] ) ) {
-        $val     = '';
         $isoitem = $exif['ISOSpeedRatings'];
         /* there's a bug where this is sometimes an array and sometimes a scalar */
         if ( is_array( $isoitem ) ) {
@@ -299,25 +295,54 @@ class MMWWEXIFReader {
   }
 
   /**
-   * convert a GPS exif reference to decimal degrees
+   *  Convert timezone and offset to UNIX timestamp.
+   *
+   * If the offset to UTC is provided, use it.
+   * If not, assume the time is in local time and offset it to UTC.
+   *
+   * @param string $time  A timestamp like '2025:12:17 12:34'. Note colons in dates. Exif is wierd.
+   * @param string $offset  An offset to UTC like '+5:30' or null, or empty.
+   *
+   * @return false|int
+   */
+  private function getTime( $time, $offset = null ) {
+    list( $dat, $tim ) = explode( ' ', trim( $time ) );
+    list( $y, $m, $d ) = explode( ':', $dat );
+    $str = "$y-$m-$d $tim";
+    if ( is_string ($offset) && strlen ($offset) > 0 ) {
+      $str .= trim( $offset ?: '' );
+      return strtotime( $str );
+    } else {
+        $result = strtotime( $str );
+      try {
+        return MMWWMedia::offset_timestamp_by_zone( $result, false );
+      } catch ( Exception $e ) {
+        return $result;
+      }
+    }
+  }
+
+  /**
+   * Convert a GPS exif reference to decimal degrees
+   *
+   * EXIF represents values with rational numbers in strings.
+   * For example the string "9/2" is used to represent 3.5.
    *
    * @param string $ref N, E, S, W
-   * @param array of three strings showing rational numbes $c
+   * @param array $c One to three strings of rational numbers: degrees, degrees/minutes, or degrees/minutes/seconds.
    *
-   * @return string with degree
+   * @return float Degrees.
    */
   private function getGPS( $ref, $c ) {
-    $sign = 1;
     // south, west, or negative altitude
-    if ( $ref[0] == 'S' || $ref[0] == 'W' ) {
-      $sign = - 1;
+    $sign = ( $ref[0] == 'S' || $ref[0] == 'W' ) ? - 1 : 1;
+    $val  = 0.0;
+    while ( $r = array_pop( $c ) ) {
+      $val *= (1.0/ 60.0);
+      $val += wp_exif_frac2dec( $r );
     }
 
-    $d      = wp_exif_frac2dec( $c[0] );
-    $m      = wp_exif_frac2dec( $c[1] );
-    $s      = wp_exif_frac2dec( $c[2] );
-    $result = $sign * ( ( $d ) + ( $m / 60.0 ) + ( $s / 3600.0 ) );
-
-    return round( $result, 6 );
+    return round( $sign * $val, 6 );
   }
+
 }

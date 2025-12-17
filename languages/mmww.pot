@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-12-13T21:33:03+00:00\n"
+"POT-Creation-Date: 2025-12-16T15:51:23+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: mmww\n"
@@ -567,10 +567,6 @@ msgstr ""
 msgid "Save Changes"
 msgstr ""
 
-#: code/mmww_media_upload.php:431
-msgid "Unrecognized media type in file "
-msgstr ""
-
 #: code/pdfextras.php:15
 msgid "PDFs"
 msgstr ""
@@ -590,7 +586,7 @@ msgstr[1] ""
 msgid "Media attachment metadata reloaded from file. Update to save it."
 msgstr ""
 
-#: code/reread.php:202
-#: code/reread.php:295
+#: code/reread.php:200
+#: code/reread.php:293
 msgid "Reload Metadata"
 msgstr ""

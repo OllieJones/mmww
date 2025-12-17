@@ -121,13 +121,11 @@ class MMWWIPTCReader {
         $meta['credit'] = $this->make_utf8( trim( $iptc['2#080'][0] ) );
       }
 
-      if ( ( ! empty( $iptc['2#055'][0] ) ) and ( ! empty( $iptc['2#060'][0] ) ) ) { // created date and time
-
-        /* do the timezone stuff right; creation time is in local time */
-        $previous = date_default_timezone_get();
-        @date_default_timezone_set( get_option( 'timezone_string' ) );
+      /* https://exiftool.org/TagNames/IPTC.html#ApplicationRecord
+       * 055 is DateCreated like "20251217".
+       * 060 is TimeCreated with a zone offset like "1234-0500" */
+      if ( ( ! empty( $iptc['2#055'][0] ) ) and ( ! empty( $iptc['2#060'][0] ) ) ) {
         $meta['created_timestamp'] = strtotime( $iptc['2#055'][0] . ' ' . $iptc['2#060'][0] );
-        @date_default_timezone_set( $previous );
       }
       if ( ! empty( $iptc['2#116'][0] ) ) // copyright
       {
@@ -138,10 +136,7 @@ class MMWWIPTCReader {
     return $meta;
   }
 
-  private
-  function make_utf8(
-    $string
-  ) {
+  private function make_utf8( $string ) {
     if ( $this->is_utf8( $string ) ) {
       return $string;
     } else {
@@ -157,9 +152,7 @@ class MMWWIPTCReader {
    * @since        1.14
    * @subpackage
    */
-  private function is_utf8(
-    $string
-  ) {
+  private function is_utf8( $string ) {
 
     // From http://w3.org/International/questions/qa-forms-utf-8.html
     return preg_match( '%^(?:

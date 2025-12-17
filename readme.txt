@@ -71,9 +71,11 @@ You can use parentheses to delimit optional parts of a metadata template string.
 
 The parentheses denote the whole clause as optional, and omitted if the metadata mentioned in it is not available.
 
-Similarly, you can create a URL that will display a map centered on the spot your photo was taken, but only if latitude and longitude are available in the photo's metadata, like this:
+Similarly, you can create a URL that will display a map centered on the spot your photo was taken, but only if latitude and longitude are available in the photo's metadata, like one of these:
 
-     (<A href="https://maps.google.com/?ll={latitude},{longitude}&z=18" target="_blank">\(Map {title}\)</A>)
+     (<A href="https://www.openstreetmap.org/search?query={latitude},{longitude}&zoom=14&layers=S" target="_blank">\(Open Street Map {title}\)</A>)
+     (<A href="https://maps.google.com/?ll={latitude},{longitude}&z=18" target="_blank">\(Google Maps {title}\)</A>)
+
 
 If you want literal parentheses or curly braces to appear in your metadata, use the backslash character to escape them in your template data.
 

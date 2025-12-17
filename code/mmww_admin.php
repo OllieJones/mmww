@@ -148,7 +148,7 @@ class MMWWAdmin {
    *
    * @param array $input
    *
-   * @return validated array
+   * @return array The validated array
    */
   function validate_options( $input ) {
     $codes = [
@@ -162,6 +162,7 @@ class MMWWAdmin {
       'image_alt',
       'application_title',
       'application_caption',
+      'application_displaycaption',
       'use_creation_date',
       'populate_tags',
       'populate_ratings',
@@ -302,6 +303,14 @@ class MMWWAdmin {
           [ $this, 'application_text' ],
           'mmww' );
 
+        add_settings_field(
+            'mmww_admin_application_displaycaption',
+            __( 'PDF caption template', 'mmww' ),
+            [ $this, 'admin_text' ],
+            'mmww',
+            'mmww_admin_application',
+            'application_displaycaption' /* wp_posts.post_excerpt */
+        );
         add_settings_field(
           'mmww_admin_application_title',
           __( 'PDF title template', 'mmww' ),

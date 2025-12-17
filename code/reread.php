@@ -72,7 +72,7 @@ class MMWWRereader {
 
   function retrieve_old( $post ) {
     $saved = get_post_meta( $post->ID, '_mmww_saved_attachment_metadata', true );
-    $meta  = ( is_array( $saved )  && isset( $saved['image_meta'] ) && is_array( $saved['image_meta'] ) ) ? $saved['image_meta'] : array();
+    $meta  = ( is_array( $saved ) && isset( $saved['image_meta'] ) && is_array( $saved['image_meta'] ) ) ? $saved['image_meta'] : array();
     foreach ( $this->fields as $k => $v ) {
       if ( ! empty( $saved[ $k ] ) ) {
         $meta[ $k ] = $saved[ $k ];
@@ -100,11 +100,10 @@ class MMWWRereader {
       }
     }
 
-    /* make any updates needed to the posts table. */  //HACK HACK use ordinary post update, not this SQL jazz.
+    /* make any updates needed to the posts table. */
     if ( ! empty ( $updates ) ) {
-      global $wpdb;
-      $where = [ 'ID' => $id ];
-      $wpdb->update( $wpdb->posts, $updates, $where );
+      $updates['ID'] = $id;
+      wp_update_post( wp_kses_post_deep( $updates ) );
       clean_post_cache( $id );
     }
 
@@ -159,13 +158,14 @@ class MMWWRereader {
       }
     }
 
-    $meta['alt']        = get_post_meta( $post->ID, '_wp_attachment_image_alt', true );
-    $oldmeta            = get_post_meta( $post->ID, '_wp_attachment_metadata', true );
-		if ( is_array ($oldmeta) && isset( $oldmeta['image_meta'] ) && is_array( $oldmeta['image_meta'] )) {
-			$meta['image_meta'] = $oldmeta['image_meta'];
-		} else {
-			$meta['image_meta'] = array();
-		}
+    $meta['alt'] = get_post_meta( $post->ID, '_wp_attachment_image_alt', true );
+    $oldmeta     = get_post_meta( $post->ID, '_wp_attachment_metadata', true );
+    if ( is_array( $oldmeta ) && isset( $oldmeta['image_meta'] ) && is_array( $oldmeta['image_meta'] ) ) {
+      $meta['image_meta'] = $oldmeta['image_meta'];
+    } else {
+      $meta['image_meta'] = array();
+    }
+
     return $meta;
   }
 
