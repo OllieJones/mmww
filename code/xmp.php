@@ -174,9 +174,9 @@ class MMWWXMPReader {
         }
         foreach ( $list as list( $tag, $xpath) ) {
           $errors = error_reporting();
-          //hack hack error_reporting( $errors & ! E_WARNING );
-          $it = $xmp->xpath( $xpath ); //hack hack put back the @
-          //error_reporting( $errors );
+          error_reporting( $errors & ! E_WARNING );
+          $it = $xmp->xpath( $xpath );
+          error_reporting( $errors );
           if ( ! ( $it === false ) ) {
             $gather = [];
             foreach ( $it as $s ) {
